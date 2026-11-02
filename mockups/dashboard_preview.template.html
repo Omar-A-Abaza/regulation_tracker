@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Regulation Tracker</title>
+<style>
+  :root {
+    --bg: #ffffff; --panel: #f6f7f9; --text: #1f2430; --muted: #5d6475;
+    --line: #e3e6eb; --accent: #3355cc; --accent-soft: #e8edfb;
+    --ok: #1e7d4f; --ok-soft: #e3f4ea; --warn: #9a6200; --warn-soft: #fdf1dc;
+    --bad: #b3261e; --bad-soft: #fbe5e3; --tag: #eef0f4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171d; --panel: #1c2028; --text: #e6e8ec; --muted: #9aa1ae;
+      --line: #2c313b; --accent: #8aa4ff; --accent-soft: #232c45;
+      --ok: #6fd3a0; --ok-soft: #173327; --warn: #f0c060; --warn-soft: #3a2f17;
+      --bad: #ff8a80; --bad-soft: #3d1f1d; --tag: #262b35;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--accent); }
+  .preview-banner { background: var(--warn-soft); color: var(--warn); padding: 10px 16px;
+    font-size: 14px; text-align: center; border-bottom: 1px solid var(--line); }
+  .layout { display: flex; min-height: 100vh; }
+  aside { width: 270px; flex-shrink: 0; background: var(--panel); border-right: 1px solid var(--line);
+    padding: 24px 20px; }
+  aside h1 { font-size: 18px; margin: 0 0 4px; }
+  aside .sub { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+  .nav button { display: block; width: 100%; text-align: left; padding: 9px 12px; margin-bottom: 4px;
+    border: 0; border-radius: 8px; background: transparent; color: var(--text); font: inherit; cursor: pointer; }
+  .nav button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .filters { margin-top: 28px; }
+  .filters h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 10px; }
+  .filters label.title { display: block; font-size: 14px; font-weight: 600; margin: 16px 0 6px; }
+  .filters select { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--text); font: inherit; }
+  .check { display: flex; gap: 8px; align-items: center; font-size: 14px; margin: 4px 0; }
+  main { flex: 1; padding: 32px 40px; max-width: 980px; }
+  main h2 { font-size: 26px; margin: 0 0 6px; }
+  .lead { color: var(--muted); margin: 0 0 24px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .card { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; background: var(--bg); }
+  .card .label { font-size: 13px; color: var(--muted); }
+  .card .big { font-size: 30px; font-weight: 700; line-height: 1.2; margin: 4px 0; }
+  .card .small { font-size: 14px; }
+  .card.highlight { border-color: var(--warn); background: var(--warn-soft); }
+  .card.highlight .big { color: var(--warn); }
+  h3 { font-size: 19px; margin: 32px 0 12px; }
+  .item { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 12px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+  .badge { padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--accent-soft); color: var(--accent); }
+  .badge.new { background: var(--ok-soft); color: var(--ok); }
+  .item .ttl { font-size: 17px; font-weight: 600; margin: 8px 0 4px; }
+  .item .note { margin: 0 0 10px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { background: var(--tag); padding: 2px 8px; border-radius: 6px; font-size: 12px; }
+  details { margin-top: 10px; font-size: 14px; }
+  details summary { cursor: pointer; color: var(--accent); }
+  details .todo { color: var(--muted); padding: 8px 0 0; }
+  .empty { border: 1px dashed var(--line); border-radius: 12px; padding: 18px; color: var(--muted); }
+  .more { background: none; border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px;
+    color: var(--accent); font: inherit; cursor: pointer; }
+  table.health { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.health th, table.health td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  table.health th { color: var(--muted); font-weight: 600; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+  .dot.ok { background: var(--ok); } .dot.bad { background: var(--bad); }
+  .tl { position: relative; padding-left: 28px; }
+  .tl::before { content: ""; position: absolute; left: 9px; top: 6px; bottom: 6px; width: 2px; background: var(--line); }
+  .ms { position: relative; margin-bottom: 18px; border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; }
+  .ms::before { content: ""; position: absolute; left: -25px; top: 20px; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--bg); border: 3px solid var(--muted); }
+  .ms.done::before { border-color: var(--ok); background: var(--ok); }
+  .ms.soon::before { border-color: var(--warn); }
+  .ms.soon { border-color: var(--warn); }
+  .ms .when { font-size: 14px; font-weight: 600; }
+  .ms.done .when { color: var(--ok); } .ms.soon .when { color: var(--warn); } .ms.later .when { color: var(--muted); }
+  .ms .ttl { font-size: 17px; font-weight: 600; margin: 2px 0 4px; }
+  .moved { display: inline-block; margin-top: 6px; font-size: 13px; background: var(--bad-soft); color: var(--bad);
+    padding: 2px 8px; border-radius: 6px; }
+  .moved s { opacity: .8; }
+  .hidden { display: none; }
+  @media (max-width: 760px) {
+    .layout { flex-direction: column; }
+    aside { width: 100%; border-right: 0; border-bottom: 1px solid var(--line); padding: 16px; }
+    main { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="preview-banner">
+  Preview only. It uses real data from Day 1. The real dashboard is built in Streamlit on Days 5–6 and will look a bit different.
+</div>
+<div class="layout">
+  <aside>
+    <h1>AI Regulation Tracker</h1>
+    <div class="sub">EU · US · States</div>
+    <div class="nav">
+      <button class="active" data-page="home">🏠 What's new</button>
+      <button data-page="timeline">📅 Timeline</button>
+    </div>
+    <div class="filters" id="filters">
+      <h2>Filters</h2>
+      <label class="title">Framework</label>
+      <div id="f-framework"></div>
+      <label class="title">Category</label>
+      <div id="f-category"></div>
+      <label class="title" for="f-days">Date range</label>
+      <select id="f-days">
+        <option value="30" selected>Last 30 days</option>
+        <option value="90">Last 90 days</option>
+        <option value="365">Last 12 months</option>
+        <option value="99999">All time</option>
+      </select>
+    </div>
+  </aside>
+
+  <main>
+    <section id="page-home">
+      <h2>What changed this week</h2>
+      <p class="lead" id="today-line"></p>
+      <div class="cards" id="cards"></div>
+
+      <h3 id="feed-title">Recent updates</h3>
+      <div id="feed"></div>
+
+      <h3>Website status</h3>
+      <table class="health">
+        <thead><tr><th>Website</th><th>Status</th><th>Last checked</th></tr></thead>
+        <tbody id="health"></tbody>
+      </table>
+    </section>
+
+    <section id="page-timeline" class="hidden">
+      <h2>Deadlines</h2>
+      <p class="lead">When each rule starts. Worked out from today's date.</p>
+      <div class="tl" id="timeline"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+const DOCS = /*SEED_DOCS*/;
+const MILESTONES = /*TIMELINE*/;
+
+const FRAMEWORKS = { eu_ai_act: "EU AI Act", nist_ai_rmf: "NIST AI RMF", us_federal: "US federal", us_state: "US states" };
+const CATEGORIES = { gpai: "GPAI", high_risk: "High-risk", prohibited: "Banned uses", penalties: "Fines",
+                     transparency: "Transparency", governance: "Governance" };
+const SOURCES = { eurlex: "EUR-Lex", eu_ai_office: "EU AI Office", nist: "NIST",
+                  federal_register: "Federal Register", state_laws: "State law" };
+// Day 1 test results. The real app reads these from the scrape log.
+const HEALTH = [
+  ["EUR-Lex", true, "Works (EU data service)"],
+  ["EU AI Office", false, "Blocked (error 403)"],
+  ["NIST", true, "Works"],
+  ["Federal Register", true, "Works (data feed)"],
+];
+const SOON_DAYS = 90;
+
+const today = new Date(); today.setHours(0, 0, 0, 0);
+const DAY = 86400000;
+const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const fmt = d => d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+const daysFrom = s => Math.round((parse(s) - today) / DAY);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function checkboxes(id, map) {
+  document.getElementById(id).innerHTML = Object.entries(map).map(([k, v]) =>
+    `<label class="check"><input type="checkbox" value="${k}" checked> ${v}</label>`).join("");
+}
+checkboxes("f-framework", FRAMEWORKS);
+checkboxes("f-category", CATEGORIES);
+const checked = id => [...document.querySelectorAll(`#${id} input:checked`)].map(i => i.value);
+
+let showAll = false;
+
+function renderHome() {
+  const fw = checked("f-framework"), cat = checked("f-category");
+  const range = Number(document.getElementById("f-days").value);
+  const matches = DOCS.filter(d => fw.includes(d.framework) && d.categories.some(c => cat.includes(c)))
+                      .sort((a, b) => b.date_published.localeCompare(a.date_published));
+  const inRange = matches.filter(d => -daysFrom(d.date_published) <= range);
+  const thisWeek = DOCS.filter(d => -daysFrom(d.date_published) <= 7).length;
+  const next = MILESTONES.filter(m => daysFrom(m.date) >= 0).sort((a, b) => a.date.localeCompare(b.date))[0];
+
+  document.getElementById("today-line").textContent = `Today is ${fmt(today)}.`;
+  document.getElementById("cards").innerHTML = `
+    <div class="card"><div class="label">New this week</div><div class="big">${thisWeek}</div>
+      <div class="small">${thisWeek ? "documents found" : "Nothing new in the last 7 days"}</div></div>
+    <div class="card"><div class="label">New in last 30 days</div>
+      <div class="big">${DOCS.filter(d => -daysFrom(d.date_published) <= 30).length}</div>
+      <div class="small">across all websites</div></div>
+    ${next ? `<div class="card highlight"><div class="label">Next deadline</div>
+      <div class="big">${daysFrom(next.date)} days</div>
+      <div class="small"><b>${fmt(parse(next.date))}</b> · ${esc(next.title)}</div></div>` : ""}`;
+
+  const rangeLabel = document.querySelector("#f-days option:checked").textContent;
+  document.getElementById("feed-title").textContent = `Recent updates · ${rangeLabel.toLowerCase()} (${inRange.length})`;
+  const list = showAll ? matches : inRange;
+  const older = matches.length - inRange.length;
+  document.getElementById("feed").innerHTML =
+    (list.length ? list.map(item).join("") : `<div class="empty">No updates match these filters in this date range.</div>`) +
+    (!showAll && older > 0 ? `<button class="more" id="more">Show ${older} older</button>` : "");
+  const more = document.getElementById("more");
+  if (more) more.onclick = () => { showAll = true; renderHome(); };
+
+  document.getElementById("health").innerHTML = HEALTH.map(([name, ok, msg]) =>
+    `<tr><td>${name}</td><td><span class="dot ${ok ? "ok" : "bad"}"></span>${msg}</td><td>Day 1 test</td></tr>`).join("");
+}
+
+function item(d) {
+  const ago = -daysFrom(d.date_published);
+  return `<div class="item">
+    <div class="meta"><span class="badge">${SOURCES[d.source] || d.source}</span>
+      ${ago <= 7 ? `<span class="badge new">New</span>` : ""}
+      <span>${fmt(parse(d.date_published))} · ${ago === 0 ? "today" : ago + " days ago"}</span></div>
+    <div class="ttl">${esc(d.title)}</div>
+    <p class="note">${esc(d.note)}</p>
+    <div class="tags">${d.categories.map(c => `<span class="tag">${CATEGORIES[c] || c}</span>`).join("")}</div>
+    <details><summary>AI summary</summary>
+      <div class="todo">Coming in Week 2: a 3-bullet summary, who it affects, the key deadline, and how urgent it is.</div></details>
+    <div style="margin-top:8px;font-size:14px"><a href="${esc(d.url)}" target="_blank" rel="noopener">Open source ↗</a></div>
+  </div>`;
+}
+
+function renderTimeline() {
+  document.getElementById("timeline").innerHTML = [...MILESTONES].sort((a, b) => a.date.localeCompare(b.date)).map(m => {
+    const n = daysFrom(m.date);
+    const cls = n < 0 ? "done" : n <= SOON_DAYS ? "soon" : "later";
+    const when = n < 0 ? `✅ ${fmt(parse(m.date))} · ${-n} days ago`
+               : n === 0 ? `⏳ Today` : `${n <= SOON_DAYS ? "⏳" : "🗓️"} ${fmt(parse(m.date))} · in ${n} days`;
+    return `<div class="ms ${cls}">
+      <div class="when">${when}</div>
+      <div class="ttl">${esc(m.title)}</div>
+      <div>${esc(m.summary)}</div>
+      <div class="meta" style="margin-top:6px">${m.jurisdiction}${m.articles ? " · " + m.articles.join(", ") : ""}
+        · <a href="${esc(m.source_url)}" target="_blank" rel="noopener">Source ↗</a></div>
+      ${m.original_date ? `<span class="moved">Moved from <s>${fmt(parse(m.original_date))}</s> by ${esc(m.changed_by)}</span>` : ""}
+    </div>`;
+  }).join("");
+}
+
+document.querySelectorAll(".nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".nav button").forEach(x => x.classList.toggle("active", x === b));
+  const page = b.dataset.page;
+  document.getElementById("page-home").classList.toggle("hidden", page !== "home");
+  document.getElementById("page-timeline").classList.toggle("hidden", page !== "timeline");
+  document.getElementById("filters").classList.toggle("hidden", page !== "home");
+});
+document.getElementById("filters").addEventListener("change", () => { showAll = false; renderHome(); });
+
+renderHome();
+renderTimeline();
+</script>
+</body>
+</html>

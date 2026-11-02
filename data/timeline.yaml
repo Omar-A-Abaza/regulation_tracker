@@ -1,0 +1,136 @@
+# Key AI law deadlines.
+# Every entry has a source. Dates were checked against the official text on 2026-10-26.
+#
+# Fields:
+#   date           - the date that applies now
+#   original_date  - only set if a later law moved the date
+#   changed_by     - the law that moved it
+#   status         - worked out by the app from today's date (not stored here)
+
+milestones:
+  - id: aiact_in_force
+    jurisdiction: EU
+    framework: eu_ai_act
+    date: 2024-08-01
+    title: EU AI Act enters into force
+    summary: The law is official. Most rules start later, in phases.
+    articles: [Art. 113]
+    source_url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+
+  - id: aiact_prohibitions
+    jurisdiction: EU
+    framework: eu_ai_act
+    date: 2025-02-02
+    title: Banned AI practices apply
+    summary: Some AI uses are banned outright, like social scoring and manipulating people.
+    articles: [Art. 5, Art. 113(a)]
+    categories: [prohibited]
+    source_url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+
+  - id: aiact_gpai
+    jurisdiction: EU
+    framework: eu_ai_act
+    date: 2025-08-02
+    title: GPAI model rules apply
+    summary: >
+      Companies that make general-purpose AI models must keep technical documents,
+      have a copyright policy, and publish a summary of their training data.
+      Bigger "systemic risk" models have extra duties.
+    articles: [Art. 51, Art. 53, Art. 55, Art. 113(b)]
+    categories: [gpai]
+    source_url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+
+  - id: omnibus_in_force
+    jurisdiction: EU
+    framework: eu_ai_act
+    date: 2026-07-27
+    title: Digital Omnibus on AI takes effect
+    summary: A new EU law that pushes back the high-risk deadlines and adds new bans.
+    articles: [Regulation (EU) 2026/1744]
+    source_url: https://eur-lex.europa.eu/eli/reg/2026/1744/oj
+
+  - id: aiact_general_application
+    jurisdiction: EU
+    framework: eu_ai_act
+    date: 2026-08-02
+    title: GPAI fines can start + transparency rules apply
+    summary: >
+      The EU can now fine GPAI companies (up to EUR 15M or 3% of yearly global sales,
+      whichever is higher). Users must be told when they are talking to an AI.
+    articles: [Art. 50, Art. 101, Art. 113]
+    categories: [gpai, penalties, transparency]
+    source_url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+
+  - id: omnibus_new_bans
+    jurisdiction: EU
+    framework: eu_ai_act
+    date: 2026-12-02
+    title: New bans + watermark deadline for older systems
+    summary: >
+      New bans on AI-made fake nude images and child abuse images. AI systems that
+      were on the market before Aug 2, 2026 must mark AI-made content by this date.
+    articles: [Art. 5(1a), Art. 5(1b), Art. 50(2)]
+    categories: [prohibited, transparency]
+    changed_by: Regulation (EU) 2026/1744
+    source_url: https://eur-lex.europa.eu/eli/reg/2026/1744/oj
+
+  - id: aiact_legacy_gpai
+    jurisdiction: EU
+    framework: eu_ai_act
+    date: 2027-08-02
+    title: Older GPAI models must comply
+    summary: GPAI models already on the market before Aug 2, 2025 must follow the rules by now.
+    articles: [Art. 111(3)]
+    categories: [gpai]
+    source_url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+
+  - id: aiact_high_risk_annex_iii
+    jurisdiction: EU
+    framework: eu_ai_act
+    date: 2027-12-02
+    original_date: 2026-08-02
+    changed_by: Regulation (EU) 2026/1744
+    title: High-risk AI rules apply (Annex III)
+    summary: >
+      Rules for high-risk AI used in areas like hiring, credit, schools and
+      essential services. Moved back from Aug 2, 2026.
+    articles: [Art. 6(2), Annex III]
+    categories: [high_risk]
+    source_url: https://eur-lex.europa.eu/eli/reg/2026/1744/oj
+
+  - id: aiact_high_risk_annex_i
+    jurisdiction: EU
+    framework: eu_ai_act
+    date: 2028-08-02
+    original_date: 2027-08-02
+    changed_by: Regulation (EU) 2026/1744
+    title: High-risk AI in regulated products (Annex I)
+    summary: >
+      Rules for AI that is a safety part of products like medical devices or machines.
+      Moved back from Aug 2, 2027.
+    articles: [Art. 6(1), Annex I]
+    categories: [high_risk]
+    source_url: https://eur-lex.europa.eu/eli/reg/2026/1744/oj
+
+  # --- US states ---
+  - id: ca_sb53
+    jurisdiction: US-CA
+    framework: us_state
+    date: 2026-01-01
+    title: California SB 53 (frontier AI transparency) takes effect
+    summary: >
+      Big AI developers (models trained with more than 10^26 operations) must publish
+      safety frameworks and report serious safety incidents.
+    categories: [gpai, transparency]
+    source_url: https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260SB53
+
+  - id: co_sb26_189
+    jurisdiction: US-CO
+    framework: us_state
+    date: 2027-01-01
+    title: Colorado automated decision-making law (SB 26-189) duties start
+    summary: >
+      Replaced the old Colorado AI Act (SB 24-205) before it ever took effect.
+      Covers AI used to make important decisions about people, like jobs or loans.
+    categories: [high_risk]
+    source_url: https://leg.colorado.gov/bills/sb26-189

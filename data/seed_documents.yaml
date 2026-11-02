@@ -1,0 +1,120 @@
+# Starting documents, so the dashboard isn't empty on day one.
+# All are real. Dates and links were checked on 2026-10-26.
+# These are marked as "seed" in the database and never trigger alerts.
+
+documents:
+  # --- EU ---
+  - source: eurlex
+    framework: eu_ai_act
+    title: "Regulation (EU) 2024/1689 — the EU AI Act"
+    url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    date_published: 2024-07-12
+    categories: [prohibited, high_risk, gpai, penalties, transparency]
+    note: The full EU AI Act, as published in the Official Journal.
+
+  - source: eu_ai_office
+    framework: eu_ai_act
+    title: General-Purpose AI Code of Practice
+    url: https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai
+    date_published: 2025-07-10
+    categories: [gpai]
+    note: A voluntary guide for GPAI companies. It has 3 chapters, on transparency, copyright, and safety and security.
+
+  - source: eu_ai_office
+    framework: eu_ai_act
+    title: Guidelines for providers of general-purpose AI models
+    url: https://digital-strategy.ec.europa.eu/en/policies/guidelines-gpai-providers
+    date_published: 2025-07-18
+    categories: [gpai]
+    note: Explains who counts as a GPAI provider. The EU says it will enforce the law based on these guidelines.
+
+  - source: eu_ai_office
+    framework: eu_ai_act
+    title: Template for the public summary of training content for GPAI models
+    url: https://digital-strategy.ec.europa.eu/en/library/explanatory-notice-and-template-public-summary-training-content-general-purpose-ai-models
+    date_published: 2025-07-24
+    categories: [gpai, transparency]
+    note: The form GPAI companies must use to describe what data they trained on. Using it is required.
+
+  - source: eurlex
+    framework: eu_ai_act
+    title: "Regulation (EU) 2026/1744 — Digital Omnibus on AI"
+    url: https://eur-lex.europa.eu/eli/reg/2026/1744/oj
+    date_published: 2026-07-24
+    categories: [high_risk, prohibited, transparency]
+    note: Moves the high-risk deadlines to Dec 2027 and Aug 2028, and adds new bans from Dec 2, 2026.
+
+  # --- NIST ---
+  - source: nist
+    framework: nist_ai_rmf
+    title: "AI Risk Management Framework (AI RMF 1.0) — NIST AI 100-1"
+    url: https://doi.org/10.6028/NIST.AI.100-1
+    date_published: 2023-01-26
+    categories: [governance]
+    note: The main US voluntary AI risk framework. It has 4 parts, Govern, Map, Measure and Manage. NIST says it is being revised.
+
+  - source: nist
+    framework: nist_ai_rmf
+    title: "Generative AI Profile — NIST AI 600-1"
+    url: https://doi.org/10.6028/NIST.AI.600-1
+    date_published: 2024-07-26
+    categories: [gpai, governance]
+    note: How to apply the AI RMF to generative AI, like chatbots and image generators.
+
+  - source: nist
+    framework: nist_ai_rmf
+    title: Concept note for an AI RMF Profile on Trustworthy AI in Critical Infrastructure
+    url: https://www.nist.gov/programs-projects/concept-note-ai-rmf-profile-trustworthy-ai-critical-infrastructure
+    date_published: 2026-04-07
+    categories: [governance]
+    note: Early plan for a new NIST profile on AI in power grids, water and other critical systems.
+
+  # --- US federal (executive orders) ---
+  - source: federal_register
+    framework: us_federal
+    title: "EO 14179 — Removing Barriers to American Leadership in Artificial Intelligence"
+    url: https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence
+    date_published: 2025-01-31
+    categories: [governance]
+    note: Signed Jan 23, 2025. Sets a new US AI policy after the earlier order (EO 14110) was cancelled.
+
+  - source: federal_register
+    framework: us_federal
+    title: "EO 14365 — Ensuring a National Policy Framework for Artificial Intelligence"
+    url: https://www.federalregister.gov/documents/2025/12/16/2025-23092/ensuring-a-national-policy-framework-for-artificial-intelligence
+    date_published: 2025-12-16
+    categories: [governance]
+    note: Signed Dec 11, 2025. Pushes for one national AI rulebook, limiting state AI laws.
+
+  - source: federal_register
+    framework: us_federal
+    title: "EO 14409 — Promoting Advanced Artificial Intelligence Innovation and Security"
+    url: https://www.federalregister.gov/documents/2026/06/05/2026-11415/promoting-advanced-artificial-intelligence-innovation-and-security
+    date_published: 2026-06-05
+    categories: [governance]
+    note: Signed Jun 2, 2026. Focuses on AI and cybersecurity, including secure release of frontier models.
+
+  - source: federal_register
+    framework: us_federal
+    title: "EO 14434 — Inaugurating the Era of Super Intelligence"
+    url: https://www.federalregister.gov/documents/2026/10/02/2026-20321/inaugurating-the-era-of-super-intelligence
+    date_published: 2026-10-02
+    categories: [governance]
+    note: Signed Sep 29, 2026. Newest AI executive order. Read in full before summarizing.
+
+  # --- US states ---
+  - source: state_laws
+    framework: us_state
+    title: "California SB 53 — Transparency in Frontier Artificial Intelligence Act"
+    url: https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260SB53
+    date_published: 2025-09-29
+    categories: [gpai, transparency]
+    note: Signed Sep 29, 2025, in effect since Jan 1, 2026. The closest US match to the EU's GPAI rules.
+
+  - source: state_laws
+    framework: us_state
+    title: "Colorado SB 26-189 — Automated Decision-Making Technology"
+    url: https://leg.colorado.gov/bills/sb26-189
+    date_published: 2026-05-14
+    categories: [high_risk]
+    note: Replaced the Colorado AI Act (SB 24-205). Main duties start Jan 1, 2027.
