@@ -1,0 +1,312 @@
+{
+ "head": {
+  "link": [],
+  "vars": [
+   "rel",
+   "celex",
+   "date",
+   "title"
+  ]
+ },
+ "results": {
+  "distinct": false,
+  "ordered": true,
+  "bindings": [
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32026R1755"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2026-07-20"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Commission Implementing Regulation (EU) 2026/1755 of 20 July 2026 on detailed arrangements for the conduct of certain proceedings by the Commission pursuant to Regulation (EU) 2024/1689 of the European Parliament and of the Council"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_amends_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32026R1744"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2026-07-08"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Regulation (EU) 2026/1744 of the European Parliament and of the Council of 8 July 2026 amending Regulations (EU) 2024/1689, (EU) 2018/1139 and (EU) 2023/1230 as regards the simplification of the implementation of harmonised rules on artificial intelligence (Digital Omnibus on AI) (Text with EEA relevance)"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "52026DC0234"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2026-05-20"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "REPORT FROM THE COMMISSION TO THE EUROPEAN PARLIAMENT AND THE COUNCIL REPORT ADOPTED PURSUANT TO ARTICLE 112(1) OF REGULATION (EU) 2024/1689 ON THE NEED TO REVIEW THE LIST OF PROHIBITED AI PRACTICES AND OF HIGH-RISK AI SYSTEMS LISTED IN ANNEX III"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_corrects_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32024R1689R(04)"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2026-05-04"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_corrects_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32024R1689R(03)"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2026-03-27"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "52026IP0066"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2026-03-10"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "P10_TA(2026)0066 – Copyright and generative artificial intelligence – opportunities and challenges – European Parliament resolution of 10 March 2026 on copyright and generative artificial intelligence – opportunities and challenges (2025/2058(INI))"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "52026IP0022"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2026-01-22"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "P10_TA(2026)0022 – European technological sovereignty and digital infrastructure – European Parliament resolution of 22 January 2026 on European technological sovereignty and digital infrastructure (2025/2007(INI))"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_corrects_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32024R1689R(02)"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-12-19"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "52025IP0337"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-12-17"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "P10_TA(2025)0337 – Digitalisation, artificial intelligence and algorithmic management in the workplace – shaping the future of work – European Parliament resolution of 17 December 2025 with recommendations to the Commission on digitalisation, artificial intelligence and algorithmic management in the workplace – shaping the future of work (2025/2080(INL))"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "52025IP0299"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-11-26"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "P10_TA(2025)0299 – Protection of minors online – European Parliament resolution of 26 November 2025 on the protection of minors online (2025/2060(INI))"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "52025IP0286"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-11-25"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "P10_TA(2025)0286 – Impact of artificial intelligence on the financial sector – European Parliament resolution of 25 November 2025 on the impact of artificial intelligence on the financial sector (2025/2056(INI))"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "52025IP0278"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-11-13"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "P10_TA(2025)0278 – Gender Equality Strategy 2025 – European Parliament resolution of 13 November 2025 on the Gender Equality Strategy 2025 (2024/2125(INI))"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_corrects_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32024R1689R(01)"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-10-09"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "52025IP0198"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-09-11"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "P10_TA(2025)0198 – Stock-taking of the European elections 2024 – European Parliament resolution of 11 September 2025 on the stocktaking of the European elections 2024 (2025/2012(INI))"
+    }
+   },
+   {
+    "rel": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32025R0454"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-03-07"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Commission Implementing Regulation (EU) 2025/454 of 7 March 2025 laying down the rules for the application of Regulation (EU) 2024/1689 of the European Parliament and of the Council as regards the establishment of a scientific panel of independent experts in the field of artificial intelligence"
+    }
+   }
+  ]
+ }
+}
