@@ -14,13 +14,17 @@ from dotenv import load_dotenv
 
 from database import repository as repo
 from scrapers.base import BaseScraper, DocumentCandidate
+from scrapers.eu_ai_office import EuAiOfficeScraper
 from scrapers.eurlex import EurLexScraper
+from scrapers.federal_register import FederalRegisterScraper
+from scrapers.nist import NistScraper
 
 ROOT = Path(__file__).resolve().parent
 SEED_FILE = ROOT / "data" / "seed_documents.yaml"
 
 SCRAPERS: dict[str, type[BaseScraper]] = {
-    EurLexScraper.name: EurLexScraper,
+    scraper.name: scraper
+    for scraper in (EurLexScraper, EuAiOfficeScraper, NistScraper, FederalRegisterScraper)
 }
 
 

@@ -152,12 +152,12 @@ const CATEGORIES = { gpai: "GPAI", high_risk: "High-risk", prohibited: "Banned u
                      transparency: "Transparency", governance: "Governance" };
 const SOURCES = { eurlex: "EUR-Lex", eu_ai_office: "EU AI Office", nist: "NIST",
                   federal_register: "Federal Register", state_laws: "State law" };
-// Day 1 test results. The real app reads these from the scrape log.
+// Day 3 test results. The real app reads these from the scrape log.
 const HEALTH = [
   ["EUR-Lex", true, "Works (EU data service)"],
-  ["EU AI Office", false, "Blocked (error 403)"],
-  ["NIST", true, "Works"],
-  ["Federal Register", true, "Works (data feed)"],
+  ["EU AI Office", true, "Works (news feed)"],
+  ["NIST", true, "Works (news feeds)"],
+  ["Federal Register", true, "Works (data service)"],
 ];
 const SOON_DAYS = 90;
 
@@ -209,7 +209,7 @@ function renderHome() {
   if (more) more.onclick = () => { showAll = true; renderHome(); };
 
   document.getElementById("health").innerHTML = HEALTH.map(([name, ok, msg]) =>
-    `<tr><td>${name}</td><td><span class="dot ${ok ? "ok" : "bad"}"></span>${msg}</td><td>Day 1 test</td></tr>`).join("");
+    `<tr><td>${name}</td><td><span class="dot ${ok ? "ok" : "bad"}"></span>${msg}</td><td>Day 3 test</td></tr>`).join("");
 }
 
 function item(d) {

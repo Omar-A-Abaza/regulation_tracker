@@ -3,12 +3,16 @@ import re
 
 # Each category is tagged if any of its patterns appear in the text.
 CATEGORY_PATTERNS = {
-    "gpai": [r"general[- ]purpose", r"\bgpai\b", r"foundation model", r"frontier (ai|model)"],
+    # Not "super intelligence": since 2026 the US uses it to mean AI in general.
+    # CAISI / AISI test frontier models, so their work counts as GPAI.
+    "gpai": [r"general[- ]purpose", r"\bgpai\b", r"foundation model", r"frontier (ai|model)", r"\bcopyright", r"\bc?aisi\b"],
     "prohibited": [r"\bprohibit", r"\bbanned\b", r"\barticle 5\b"],
     "high_risk": [r"high[- ]risk", r"\bannex iii\b"],
-    "penalties": [r"\bpenalt", r"\bfines?\b", r"\bproceedings\b", r"\benforcement\b", r"\bsanction"],
+    "penalties": [r"\bpenalt", r"\bfines?\b", r"\bproceedings\b", r"\benforcement\b", r"\bsanction", r"consent order"],
     "transparency": [r"\btransparen", r"\bwatermark", r"synthetic (content|audio|image|video|text)", r"deep ?fake", r"\barticle 50\b"],
-    "governance": [r"scientific panel", r"\bai office\b", r"\bai board\b", r"\bgovernance\b", r"\bsandbox", r"risk management framework"],
+    "governance": [r"scientific panel", r"\bai office\b", r"\bai board\b", r"\bgovernance\b", r"\bsandbox", r"risk management framework",
+                   r"\bstandards?\b", r"policy statement", r"\bframework\b", r"action plan", r"\bguidelines?\b",
+                   r"request for information", r"\brfi\b", r"consortium"],
 }
 
 FALLBACK = "other"

@@ -1,9 +1,12 @@
-"""Shared tools for every scraper: a polite web client and the "found document" shape."""
+"""Shared tools for every scraper: a polite web client, the "found document" shape,
+and a news-feed (RSS) reader."""
 import time
 from dataclasses import dataclass, field
 from datetime import date
+from email.utils import parsedate_to_datetime
 
 import httpx
+from bs4 import BeautifulSoup
 
 USER_AGENT = "ai-regulation-tracker/0.1 (compliance research project)"
 
@@ -68,3 +71,42 @@ class BaseScraper:
         if wait > 0:
             time.sleep(wait)
         self._last_request = time.monotonic()
+
+
+@dataclass
+class FeedItem:
+    title: str
+    link: str
+    published: date | None
+    description_html: str
+
+
+def read_rss_items(xml: bytes) -> list[FeedItem]:
+    """Read the items out of an RSS news feed."""
+    soup = BeautifulSoup(xml, "xml")
+    items = []
+    for item in soup.find_all("item"):
+        published = None
+        if item.pubDate and item.pubDate.text.strip():
+            published = parsedate_to_datetime(item.pubDate.text.strip()).date()
+        items.append(
+            FeedItem(
+                title=clean_text(item.title.text if item.title else ""),
+                link=(item.link.text if item.link else "").strip(),
+                published=published,
+                description_html=item.description.text if item.description else "",
+            )
+        )
+    return items
+
+
+def clean_text(html: str) -> str:
+    """HTML to plain text, with extra spaces removed."""
+    return " ".join(BeautifulSoup(html, "lxml").get_text(" ").split())
+
+
+def first_sentence(text: str, max_len: int = 220) -> str:
+    """A short note: the first sentence, cut at max_len."""
+    end = text.find(". ")
+    sentence = text[: end + 1] if 0 < end < max_len else text
+    return sentence if len(sentence) <= max_len else sentence[: max_len - 1].rstrip() + "…"

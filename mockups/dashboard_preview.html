@@ -150,6 +150,7 @@ const DOCS = [
   "framework": "eu_ai_act",
   "title": "Regulation (EU) 2024/1689 \u2014 the EU AI Act",
   "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+  "external_id": "32024R1689",
   "date_published": "2024-07-12",
   "categories": [
    "prohibited",
@@ -199,6 +200,7 @@ const DOCS = [
   "framework": "eu_ai_act",
   "title": "Regulation (EU) 2026/1744 \u2014 Digital Omnibus on AI",
   "url": "https://eur-lex.europa.eu/eli/reg/2026/1744/oj",
+  "external_id": "32026R1744",
   "date_published": "2026-07-24",
   "categories": [
    "high_risk",
@@ -246,6 +248,7 @@ const DOCS = [
   "framework": "us_federal",
   "title": "EO 14179 \u2014 Removing Barriers to American Leadership in Artificial Intelligence",
   "url": "https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence",
+  "external_id": "2025-02172",
   "date_published": "2025-01-31",
   "categories": [
    "governance"
@@ -257,6 +260,7 @@ const DOCS = [
   "framework": "us_federal",
   "title": "EO 14365 \u2014 Ensuring a National Policy Framework for Artificial Intelligence",
   "url": "https://www.federalregister.gov/documents/2025/12/16/2025-23092/ensuring-a-national-policy-framework-for-artificial-intelligence",
+  "external_id": "2025-23092",
   "date_published": "2025-12-16",
   "categories": [
    "governance"
@@ -268,6 +272,7 @@ const DOCS = [
   "framework": "us_federal",
   "title": "EO 14409 \u2014 Promoting Advanced Artificial Intelligence Innovation and Security",
   "url": "https://www.federalregister.gov/documents/2026/06/05/2026-11415/promoting-advanced-artificial-intelligence-innovation-and-security",
+  "external_id": "2026-11415",
   "date_published": "2026-06-05",
   "categories": [
    "governance"
@@ -279,6 +284,7 @@ const DOCS = [
   "framework": "us_federal",
   "title": "EO 14434 \u2014 Inaugurating the Era of Super Intelligence",
   "url": "https://www.federalregister.gov/documents/2026/10/02/2026-20321/inaugurating-the-era-of-super-intelligence",
+  "external_id": "2026-20321",
   "date_published": "2026-10-02",
   "categories": [
    "governance"
@@ -489,12 +495,12 @@ const CATEGORIES = { gpai: "GPAI", high_risk: "High-risk", prohibited: "Banned u
                      transparency: "Transparency", governance: "Governance" };
 const SOURCES = { eurlex: "EUR-Lex", eu_ai_office: "EU AI Office", nist: "NIST",
                   federal_register: "Federal Register", state_laws: "State law" };
-// Day 1 test results. The real app reads these from the scrape log.
+// Day 3 test results. The real app reads these from the scrape log.
 const HEALTH = [
   ["EUR-Lex", true, "Works (EU data service)"],
-  ["EU AI Office", false, "Blocked (error 403)"],
-  ["NIST", true, "Works"],
-  ["Federal Register", true, "Works (data feed)"],
+  ["EU AI Office", true, "Works (news feed)"],
+  ["NIST", true, "Works (news feeds)"],
+  ["Federal Register", true, "Works (data service)"],
 ];
 const SOON_DAYS = 90;
 
@@ -546,7 +552,7 @@ function renderHome() {
   if (more) more.onclick = () => { showAll = true; renderHome(); };
 
   document.getElementById("health").innerHTML = HEALTH.map(([name, ok, msg]) =>
-    `<tr><td>${name}</td><td><span class="dot ${ok ? "ok" : "bad"}"></span>${msg}</td><td>Day 1 test</td></tr>`).join("");
+    `<tr><td>${name}</td><td><span class="dot ${ok ? "ok" : "bad"}"></span>${msg}</td><td>Day 3 test</td></tr>`).join("");
 }
 
 function item(d) {

@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:og="http://ogp.me/ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:schema="http://schema.org/" xmlns:sioc="http://rdfs.org/sioc/ns#" xmlns:sioct="http://rdfs.org/sioc/types#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" version="2.0" xml:base="https://www.nist.gov/">
+  <channel>
+    <title>News and Events Feed by Topic</title>
+    <link>https://www.nist.gov/topics</link>
+    <description/>
+    <language>en</language>
+    <atom:link href="https://www.nist.gov/news-events/super%20intelligence/rss.xml" rel="self" type="application/rss+xml"/>
+
+    <item>
+  <title>Key Practices for Incident Readiness and Response in Super Intelligence Training and Evaluation</title>
+  <link>https://www.nist.gov/news-events/news/2026/10/key-practices-incident-readiness-and-response-super-intelligence-training</link>
+  <description>  Key Practices for Incident Readiness and Response in Super Intelligence Training and Evaluation Today, NIST’s Center for Advancing Innovation and Standards for Super Intelligence (NIST CAISSI), the National Security Agency’s Super Intelligence
+
+</description>
+  <pubDate>Fri, 16 Oct 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Anita Rao</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1922751</guid>
+    </item>
+<item>
+  <title>Spotlight: NIST Programmer Develops Software Libraries</title>
+  <link>https://www.nist.gov/news-events/news/2026/09/spotlight-nist-programmer-develops-software-libraries</link>
+  <description>  Meet NIST mechanical engineer Rachael Sexton, whose research focuses on human factors engineering and human systems integration — essentially how humans and machines can work together. By “machines,” she means a designed system, such as computers
+
+</description>
+  <pubDate>Mon, 14 Sep 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Sarah Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1920686</guid>
+    </item>
+<item>
+  <title>NIST Awards More Than $30 Million for MEP Centers in 11 States and Puerto Rico</title>
+  <link>https://www.nist.gov/news-events/news/2026/09/nist-awards-more-30-million-mep-centers-11-states-and-puerto-rico</link>
+  <description>  The awards will help small and medium-sized manufacturers increase the adoption of advanced manufacturing technology.
+
+</description>
+  <pubDate>Tue, 15 Sep 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Sarah Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1920296</guid>
+    </item>
+<item>
+  <title>Spotlight: Using AI Discovery Engine for Materials Exploration</title>
+  <link>https://www.nist.gov/news-events/news/2026/08/spotlight-using-ai-discovery-engine-materials-exploration</link>
+  <description>  NIST researcher Gilad Kusne collaborated with the University of Maryland researchers to use machine learning to investigate different materials based on their composition and temperature. How did they do this? They used an AI algorithm called the
+
+</description>
+  <pubDate>Mon, 03 Aug 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Sarah Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1919841</guid>
+    </item>
+<item>
+  <title>ITL AI Webinar: The Development of an AI Agent Enrichment Workflow at the National Vulnerability Database</title>
+  <link>https://www.nist.gov/news-events/events/2026/09/itl-ai-webinar-development-ai-agent-enrichment-workflow-national</link>
+  <description>  Join NIST on September 17, 2026 for an Information Technology Laboratory (ITL) AI Program hosted webinar on the development of an AI agent enrichment workflow at the National Vulnerability Database. The National Vulnerability Database (NVD)
+
+</description>
+  <pubDate>Thu, 17 Sep 2026 11:00:00 -0400</pubDate>
+    <dc:creator>Vontress Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1919131</guid>
+    </item>
+<item>
+  <title>Seeking Public Comment!  Using Artificial Intelligence for Cybersecurity Framework 2.0 Analysis and Reporting</title>
+  <link>https://www.nist.gov/news-events/news/2026/08/seeking-public-comment-using-artificial-intelligence-cybersecurity</link>
+  <description>  Seeking Public Comment! Using Artificial Intelligence for Cybersecurity Framework 2.0 Analysis and Reporting NIST announces the release of Special Publication (SP) 1353 ipd (Initial Public Draft), QuickStart Guide for Using Artificial Intelligence
+
+</description>
+  <pubDate>Wed, 19 Aug 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Aliza Reisberg</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1918746</guid>
+    </item>
+<item>
+  <title>Department of Commerce Announces Letters of Intent With 7 Companies for $874 Million to Accelerate Semiconductor R&amp;amp;D for the Compute Supply Chain</title>
+  <link>https://www.nist.gov/news-events/news/2026/07/department-commerce-announces-letters-intent-7-companies-874-million</link>
+  <description>  The Department of Commerce today announced the signing of 7 letters of intent to provide $874 million in federal incentives under the CHIPS and Science Act.
+
+</description>
+  <pubDate>Wed, 29 Jul 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Andrew Kim</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1917456</guid>
+    </item>
+<item>
+  <title>Announcing NIST&amp;#039;s Artificial Intelligence Technology Evaluation (AITE)</title>
+  <link>https://www.nist.gov/news-events/news/2026/07/announcing-nists-artificial-intelligence-technology-evaluation-aite</link>
+  <description>  The Technology Test and Evaluation Division at NIST is launching a new program to provide researchers with a sequestered testbed environment for the evaluation of AI model performance in a variety of meaningful tasks across diverse datasets
+
+</description>
+  <pubDate>Mon, 27 Jul 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Aliza Reisberg</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1917416</guid>
+    </item>
+<item>
+  <title>NIST Joins National Genesis Mission to Accelerate AI Innovation</title>
+  <link>https://www.nist.gov/news-events/news/2026/08/nist-joins-national-genesis-mission-accelerate-ai-innovation</link>
+  <description>  NIST will execute two of its efforts through its Centers for AI in Manufacturing and Critical Infrastructure.
+
+</description>
+  <pubDate>Tue, 04 Aug 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Sarah Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1917301</guid>
+    </item>
+<item>
+  <title>UK AISI / CAISI Preliminary Assessment of Kimi K3&amp;#039;s Cyber Capabilities</title>
+  <link>https://www.nist.gov/news-events/news/2026/07/uk-aisi-caisi-preliminary-assessment-kimi-k3s-cyber-capabilities</link>
+  <description>  The UK Artificial Intelligence Security Institute (UK AISI) and the U.S. Center for AI Standards and Innovation (CAISI) (UK AISI / CAISI) conducted a joint evaluation of Moonshot AI’s latest model, Kimi K3 (released on July 16, 2026 and slated for
+
+</description>
+  <pubDate>Thu, 23 Jul 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Jason Liang</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1916971</guid>
+    </item>
+<item>
+  <title>Spotlight: Test Your Robot’s Skills in NIST’s Global Online Competition</title>
+  <link>https://www.nist.gov/news-events/news/2026/06/spotlight-test-your-robots-skills-nists-global-online-competition</link>
+  <description>  How can researchers know how skilled a robot is at simple tasks, such as picking things up and putting them down?
+
+</description>
+  <pubDate>Wed, 24 Jun 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Sarah Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1915661</guid>
+    </item>
+<item>
+  <title>NIST/NIBIB Symposium on Medical Metrology and Standards for American Healthcare and Commerce</title>
+  <link>https://www.nist.gov/news-events/events/2026/09/nistnibib-symposium-medical-metrology-and-standards-american-healthcare</link>
+  <description>  This Symposium was a one-day event to address the question: “ which medical measurements and consensus standards should be prioritized to support future U.S. healthcare?” The focus will be on medical imaging, medical devices, and diagnostics. The
+
+</description>
+  <pubDate>Thu, 24 Sep 2026 09:00:00 -0400</pubDate>
+    <dc:creator>Crissy Kessell</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1915131</guid>
+    </item>
+<item>
+  <title>Department of Commerce Announces Definitive Agreement with SandboxAQ for a $500 Million CHIPS R&amp;amp;D Award to Accelerate Al-Driven Semiconductor Materials Discovery</title>
+  <link>https://www.nist.gov/news-events/news/2026/06/department-commerce-announces-definitive-agreement-sandboxaq-500-million</link>
+  <description>  The Department of Commerce’s CHIPS Research &amp;amp; Development Office today announced the signing of a definitive agreement with SandboxAQ for a $500 million award under the CHIPS and Science Act.
+
+</description>
+  <pubDate>Wed, 17 Jun 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Andrew Kim</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1914666</guid>
+    </item>
+<item>
+  <title>The Department of Commerce’s CHIPS Program Announces a Letter of Intent with Coherent for up to $50 Million to Expand Indium Phosphide Production</title>
+  <link>https://www.nist.gov/news-events/news/2026/06/department-commerces-chips-program-announces-letter-intent-coherent-50</link>
+  <description>  The Department of Commerce’s CHIPS Program Office announced the signing of a letter of intent to provide up to $50 million in direct funding to Coherent Corp. (Coherent) under the CHIPS and Science Act.
+
+</description>
+  <pubDate>Tue, 16 Jun 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Andrew Kim</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1914426</guid>
+    </item>
+<item>
+  <title>New AI Model Shows How to Evacuate for Fires One Safe Step at a Time</title>
+  <link>https://www.nist.gov/news-events/news/2026/06/new-ai-model-shows-how-evacuate-fires-one-safe-step-time</link>
+  <description>  A NIST-led team has created a new AI model that can identify safe evacuation routes in a single-story floor plan during a fire, with a multilevel version in the works.
+
+</description>
+  <pubDate>Thu, 04 Jun 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Sarah Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1913786</guid>
+    </item>
+<item>
+  <title>NIST Expands AI Consortium’s Scope, Calls for New Members</title>
+  <link>https://www.nist.gov/news-events/news/2026/05/nist-expands-ai-consortiums-scope-calls-new-members</link>
+  <description>  The consortium will focus on AI innovation and adoption, with six task groups concentrating on different aspects of AI measurement science and evaluation.
+
+</description>
+  <pubDate>Fri, 29 May 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Sarah Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1913226</guid>
+    </item>
+<item>
+  <title>NIST Mathematical Proof Supports Transition to a Continuous-Monitor-and-Update Security Model for AI Systems</title>
+  <link>https://www.nist.gov/news-events/news/2026/06/nist-mathematical-proof-supports-transition-continuous-monitor-and-update</link>
+  <description>  The proof extends to AI the logic used by famed mathematician Kurt Gödel, whose incompleteness theorems have had a profound effect on math for nearly a century.
+
+</description>
+  <pubDate>Tue, 09 Jun 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Sarah Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1912201</guid>
+    </item>
+<item>
+  <title>Towards a Best Practice Guide for Designing Equipment for Autonomous Materials R&amp;amp;D</title>
+  <link>https://www.nist.gov/news-events/events/2026/08/towards-best-practice-guide-designing-equipment-autonomous-materials-rd</link>
+  <description>  Autonomous and automated experimentation have demonstrated the possibility of accelerating materials research and development by orders of magnitude. As the materials science community transitions toward these highly automated and autonomous
+
+</description>
+  <pubDate>Tue, 11 Aug 2026 00:00:00 -0400</pubDate>
+    <dc:creator>Vontress Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1911966</guid>
+    </item>
+<item>
+  <title>Securing AI Data Center: Architecture, Security Posture, and Emerging Standards</title>
+  <link>https://www.nist.gov/news-events/events/2026/07/securing-ai-data-center-architecture-security-posture-and-emerging</link>
+  <description>  Artificial Intelligence, or AI, is a transformative technology with widespread applications, and its breakthroughs are reshaping the global balance of power. The AI data centers, the computing infrastructures that enable AI training, inference, and
+
+</description>
+  <pubDate>Wed, 22 Jul 2026 00:00:00 -0400</pubDate>
+    <dc:creator>Vontress Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1911626</guid>
+    </item>
+<item>
+  <title>CAISI Evaluation of DeepSeek V4 Pro</title>
+  <link>https://www.nist.gov/news-events/news/2026/05/caisi-evaluation-deepseek-v4-pro</link>
+  <description>  In April 2026, the Center for AI Standards and Innovation (CAISI) evaluated the open-weight AI model DeepSeek V4 Pro (“DeepSeek V4”). CAISI evaluations indicate that DeepSeek V4’s capabilities lag behind the frontier by about 8 months (Figure 1)
+
+</description>
+  <pubDate>Fri, 01 May 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Jason Liang</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1911416</guid>
+    </item>
+<item>
+  <title>Announcement: CAISI signs CRADA with OpenMined to Enable Secure AI Evaluations</title>
+  <link>https://www.nist.gov/news-events/news/2026/03/announcement-caisi-signs-crada-openmined-enable-secure-ai-evaluations</link>
+  <description>  The Center for AI Standards and Innovation (CAISI) has signed a collaborative research and development agreement (CRADA) with OpenMined, a 501(c)(3) non-profit that develops open-source software infrastructure for secure computation across
+
+</description>
+  <pubDate>Fri, 27 Mar 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Anita Rao</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1909596</guid>
+    </item>
+<item>
+  <title>NIST Information Technology Laboratory AI Webinar Series: Building Measurement Probes into Agentic AI Ecosystems</title>
+  <link>https://www.nist.gov/news-events/events/2026/04/nist-information-technology-laboratory-ai-webinar-series-building</link>
+  <description>  
+
+</description>
+  <pubDate>Tue, 07 Apr 2026 13:00:00 -0400</pubDate>
+    <dc:creator>Vontress Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1908911</guid>
+    </item>
+<item>
+  <title>CAISI signs MOU with GSA to boost AI evaluation science in federal procurement through USAi</title>
+  <link>https://www.nist.gov/news-events/news/2026/03/caisi-signs-mou-gsa-boost-ai-evaluation-science-federal-procurement-through</link>
+  <description>  CAISI's Memorandum of Understanding (MOU) with the General Services Administration will support AI evaluation at the stage of federal procurement for USAi, a secure generative platform and centralized procurement toolbox that enables federal agencies to confidently adopt AI at scale.
+
+</description>
+  <pubDate>Wed, 18 Mar 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Anita Rao</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1908816</guid>
+    </item>
+<item>
+  <title>Artificial Intelligence for Materials Science (AIMS) 2026</title>
+  <link>https://www.nist.gov/news-events/events/2026/06/artificial-intelligence-materials-science-aims-2026</link>
+  <description>  As part of the JARVIS workshop series, the 7th Artificial Intelligence for Materials Science (AIMS) is a workshop aimed at getting together experts from industry, academia, and government to facilitate highly technical dialogue on the intersection of
+
+</description>
+  <pubDate>Tue, 16 Jun 2026 00:00:00 -0400</pubDate>
+    <dc:creator>Crissy Kessell</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1907486</guid>
+    </item>
+<item>
+  <title>New Report: Challenges to the Monitoring of Deployed AI Systems</title>
+  <link>https://www.nist.gov/news-events/news/2026/03/new-report-challenges-monitoring-deployed-ai-systems</link>
+  <description>  NIST AI 800-4 organizes key findings from practitioner workshops and a systematic literature review to identify current practices and challenges in post-deployment monitoring of AI systems. This report organizes that information into monitoring categories and challenges (gaps, barriers, and open questions) for further investigation and innovation, including repeated calls for further guidance on post-deployment AI system monitoring methods such as field studies and incident monitoring.
+
+</description>
+  <pubDate>Mon, 09 Mar 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Anita Rao</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1906731</guid>
+    </item>
+<item>
+  <title>New Report: Expanding the AI Evaluation Toolbox with Statistical Models</title>
+  <link>https://www.nist.gov/news-events/news/2026/02/new-report-expanding-ai-evaluation-toolbox-statistical-models</link>
+  <description>  NIST AI 800-3 argues that the statistical validity of LLM evaluations benefits from evaluators explicitly adopting a model for analyzing evaluation results and disclosing related assumptions. Generalized linear mixed modeling is one promising approach which could form a foundation for more principled AI evaluation statistics. Future CAISI and NIST publications will further explore the application of statistical models to AI evaluation.
+
+</description>
+  <pubDate>Thu, 19 Feb 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Anita Rao</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1906641</guid>
+    </item>
+<item>
+  <title>Announcing the &amp;quot;AI Agent Standards Initiative&amp;quot; for Interoperable and Secure Innovation</title>
+  <link>https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure</link>
+  <description>  The Initiative will ensure that the next generation of AI is widely adopted with confidence, can function securely on behalf of its users, and can interoperate smoothly across the digital ecosystem.
+
+</description>
+  <pubDate>Tue, 17 Feb 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Peter Cihon</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1906621</guid>
+    </item>
+<item>
+  <title>CAISI to Host Listening Sessions on Barriers to AI Adoption</title>
+  <link>https://www.nist.gov/news-events/news/2026/02/caisi-host-listening-sessions-barriers-ai-adoption</link>
+  <description>  Listening Sessions Will Identify Barriers to AI Adoption in the Healthcare, Financial Services, and Education Sectors. Dates coming soon.
+
+</description>
+  <pubDate>Tue, 17 Feb 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Andrew Kane</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1906356</guid>
+    </item>
+<item>
+  <title>International Network for Advanced AI Measurement, Evaluation, and Science Publishes Consensus Areas on Practices for Automated Evaluations</title>
+  <link>https://www.nist.gov/news-events/news/2026/02/international-network-advanced-ai-measurement-evaluation-and-science</link>
+  <description>  Today, the International Network for Advanced AI Measurement, Evaluation, and Science published a list of key practices and open questions for measuring and evaluating AI capabilities. The International Network was founded by the Center for AI
+
+</description>
+  <pubDate>Fri, 13 Feb 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Andrew Kane</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1906351</guid>
+    </item>
+<item>
+  <title>MLXN: Machine Learning for X-ray and Neutron Scattering</title>
+  <link>https://www.nist.gov/news-events/events/2026/04/mlxn-machine-learning-x-ray-and-neutron-scattering</link>
+  <description>  Building on the success of previous meetings—in-person workshops at Lawrence Berkeley National Lab (2023) and Technische Universität München (2024), followed by MLXN25, last year's online 24-hour event that brought together researchers, practitioners
+
+</description>
+  <pubDate>Mon, 13 Apr 2026 00:00:00 -0400</pubDate>
+    <dc:creator>Crissy Kessell</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1906331</guid>
+    </item>
+<item>
+  <title>Technologies and Use Cases for Smart Standards</title>
+  <link>https://www.nist.gov/news-events/events/2026/03/technologies-and-use-cases-smart-standards</link>
+  <description>  The rapid development and deployment of emerging technologies such as artificial intelligence, blockchain, and the internet of things is driving an increased need for standards that can keep pace with the accelerating rate of technological change. As
+
+</description>
+  <pubDate>Thu, 19 Mar 2026 00:00:00 -0400</pubDate>
+    <dc:creator>Pauline Truong</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1906161</guid>
+    </item>
+<item>
+  <title>NIST Allocates Over $3 Million to Small Businesses Advancing AI, Biotechnology, Semiconductors, Quantum and More</title>
+  <link>https://www.nist.gov/news-events/news/2026/02/nist-allocates-over-3-million-small-businesses-advancing-ai-biotechnology</link>
+  <description>  NIST is allocating funding to eight small businesses in seven states under the Small Business Innovation Research (SBIR) program.
+
+</description>
+  <pubDate>Tue, 10 Feb 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Sarah Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1906091</guid>
+    </item>
+<item>
+  <title>Building the Strategic Supply Chain Network</title>
+  <link>https://www.nist.gov/news-events/events/2026/03/building-strategic-supply-chain-network</link>
+  <description>  Recent disruptions—from pandemics to infrastructure failures to (rapidly) changing trade policies —have exposed critical vulnerabilities in the U.S. supply chain. These challenges demand coordinated, data-informed responses that bridge the gap
+
+</description>
+  <pubDate>Mon, 09 Mar 2026 00:00:00 -0400</pubDate>
+    <dc:creator>Sabina Mohan</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1906071</guid>
+    </item>
+<item>
+  <title>NIST Information Technology Laboratory AI Webinar Series: The International AI Standards Landscape and ITL’s Role, Priorities, and Progress</title>
+  <link>https://www.nist.gov/news-events/events/2026/03/nist-information-technology-laboratory-ai-webinar-series-international-ai</link>
+  <description>  NIST’s Information Technology Laboratory (ITL) AI Program held an interactive webinar on the international AI standards landscape and ITL’s role, priorities, and progress. The webinar included an overview on the current state of the international AI
+
+</description>
+  <pubDate>Fri, 06 Mar 2026 12:00:00 -0500</pubDate>
+    <dc:creator>Vontress Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1905896</guid>
+    </item>
+<item>
+  <title>Towards Best Practices for Automated Benchmark Evaluations</title>
+  <link>https://www.nist.gov/news-events/news/2026/01/towards-best-practices-automated-benchmark-evaluations</link>
+  <description>  Comments Sought on Initial Public Draft of NIST AI 800-2 through March 31
+
+</description>
+  <pubDate>Fri, 30 Jan 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Peter Cihon</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1905466</guid>
+    </item>
+<item>
+  <title>CAISI Issues Request for Information About Securing AI Agent Systems</title>
+  <link>https://www.nist.gov/news-events/news/2026/01/caisi-issues-request-information-about-securing-ai-agent-systems</link>
+  <description>  The Center for AI Standards and Innovation (CAISI) at the U.S. Department of Commerce’s National Institute of Standards and Technology (NIST) has published a Request for Information (RFI) seeking insights from industry, academia, and the security
+
+</description>
+  <pubDate>Mon, 12 Jan 2026 12:00:00 +0000</pubDate>
+    <dc:creator>Peter Cihon</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1902231</guid>
+    </item>
+<item>
+  <title>NIST Launches Centers for AI in Manufacturing and Critical Infrastructure</title>
+  <link>https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical-infrastructure</link>
+  <description>  NIST has expanded its collaboration with the nonprofit MITRE Corporation as part of its efforts to ensure U.S. leadership in artificial intelligence.
+
+</description>
+  <pubDate>Mon, 22 Dec 2025 12:00:00 +0000</pubDate>
+    <dc:creator>Sarah Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1901566</guid>
+    </item>
+<item>
+  <title>Apply on USAJobs: Open CAISI Position for an AI Research Scientist</title>
+  <link>https://www.nist.gov/news-events/news/2025/12/apply-usajobs-open-caisi-position-ai-research-scientist</link>
+  <description>  Building gold-standard AI systems requires gold-standard AI measurement science. The Applied Systems team at the Center for AI Standards and Innovation (CAISI) is seeking an AI Research Scientist (IT Specialist) with expertise in evaluation methods
+
+</description>
+  <pubDate>Fri, 19 Dec 2025 12:00:00 +0000</pubDate>
+    <dc:creator>Peter Cihon</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1901431</guid>
+    </item>
+<item>
+  <title>Draft NIST Guidelines Rethink Cybersecurity for the AI Era</title>
+  <link>https://www.nist.gov/news-events/news/2025/12/draft-nist-guidelines-rethink-cybersecurity-ai-era</link>
+  <description>  New guidelines can help an organization determine ways to incorporate AI into its operations while mitigating cybersecurity risks.
+
+</description>
+  <pubDate>Tue, 16 Dec 2025 12:00:00 +0000</pubDate>
+    <dc:creator>Sarah Henderson</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1901136</guid>
+    </item>
+<item>
+  <title>CAISI Evaluation of Kimi K2 Thinking</title>
+  <link>https://www.nist.gov/news-events/news/2025/12/caisi-evaluation-kimi-k2-thinking</link>
+  <description>  The Center for AI Standards and Innovation at NIST evaluated a leading model from MoonShot AI, an AI company based in the People’s Republic of China.
+
+</description>
+  <pubDate>Fri, 12 Dec 2025 12:00:00 +0000</pubDate>
+    <dc:creator>Peter Cihon</dc:creator>
+    <guid isPermaLink="true">https://www.nist.gov/node/1900996</guid>
+    </item>
+
+  </channel>
+</rss>
