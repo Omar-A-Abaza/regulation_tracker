@@ -1,0 +1,13 @@
+[theme]
+primaryColor = "#3355cc"
+
+[client]
+# Hide developer buttons like "Deploy"; viewers only see the app.
+toolbarMode = "viewer"
+
+[server]
+# Only this computer can open the dashboard. Change when we put it on a server.
+address = "localhost"
+
+[browser]
+gatherUsageStats = false
