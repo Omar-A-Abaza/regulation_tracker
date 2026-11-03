@@ -23,7 +23,7 @@ class ScrapeRun(Base):
     source: Mapped[str] = mapped_column(String(50), index=True)
     started_at: Mapped[datetime] = mapped_column(default=utcnow)
     finished_at: Mapped[datetime | None]
-    status: Mapped[str] = mapped_column(String(20), default="running")  # running / success / failed
+    status: Mapped[str] = mapped_column(String(20), default="running")  # running / success / partial / failed
     found_count: Mapped[int] = mapped_column(default=0)
     new_count: Mapped[int] = mapped_column(default=0)
     error: Mapped[str | None] = mapped_column(Text)
@@ -57,7 +57,7 @@ class Document(Base):
 
 
 class PageFingerprint(Base):
-    """The last fingerprint (hash) of a watched page, to spot changes. Used from Day 4."""
+    """A fingerprint (hash) of a watched page. A new row is added each time the page changes."""
 
     __tablename__ = "page_fingerprints"
 
@@ -65,3 +65,4 @@ class PageFingerprint(Base):
     url: Mapped[str] = mapped_column(String(1000), index=True)
     content_hash: Mapped[str] = mapped_column(String(64))
     fetched_at: Mapped[datetime] = mapped_column(default=utcnow)
+    content_text: Mapped[str | None] = mapped_column(Text)  # kept so we can show what changed

@@ -4,7 +4,7 @@ EUR-Lex web pages block bots, so we ask the EU's official data service (SPARQL)
 instead: "Which documents are linked to the AI Act?"
 """
 import re
-from datetime import date
+from datetime import date, datetime
 
 from processors.classifier import classify
 from scrapers.base import BaseScraper, DocumentCandidate
@@ -36,6 +36,16 @@ SELECT DISTINCT ?rel ?celex ?date ?title WHERE {{
 }} ORDER BY DESC(?date)
 """
 
+# Consolidated versions: the full AI Act text with all changes merged in.
+# CELEX looks like 02024R1689-20260727 (the date that version applies from).
+VERSIONS_QUERY = f"""
+PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
+SELECT DISTINCT ?celex WHERE {{
+  ?work cdm:resource_legal_id_celex ?celex .
+  FILTER(STRSTARTS(STR(?celex), "0{AI_ACT_CELEX[1:]}-"))
+}}
+"""
+
 # Words to keep capitalised when we tidy an ALL-CAPS title.
 _KEEP_CASE = ["European Parliament", "European Union", "Council", "Commission", "Regulation", "Article", "(EU)", "AI"]
 
@@ -52,6 +62,45 @@ class EurLexScraper(BaseScraper):
 
     def fetch(self) -> list[DocumentCandidate]:
         return parse_results(self.fetch_raw())
+
+
+class EurLexVersionsScraper(BaseScraper):
+    """Catches a new full-text version of the AI Act, i.e. the law's text changed."""
+
+    name = "eurlex_versions"
+    label = "EUR-Lex (AI Act text versions)"
+
+    def fetch_raw(self) -> dict:
+        response = self.request(
+            "POST", SPARQL_URL, data={"query": VERSIONS_QUERY}, headers={"Accept": "application/sparql-results+json"}
+        )
+        return response.json()
+
+    def fetch(self) -> list[DocumentCandidate]:
+        return parse_versions(self.fetch_raw())
+
+
+def parse_versions(payload: dict) -> list[DocumentCandidate]:
+    docs = []
+    for row in payload["results"]["bindings"]:
+        celex = row["celex"]["value"]
+        match = re.match(r"^0\d{4}R\d{4}-(\d{8})$", celex)
+        if not match:
+            continue
+        applies_from = datetime.strptime(match.group(1), "%Y%m%d").date()
+        docs.append(
+            DocumentCandidate(
+                source="eurlex",
+                title=f"Full text of the EU AI Act, version of {applies_from.day} {applies_from:%b} {applies_from.year}",
+                url=f"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:{celex}",
+                framework="eu_ai_act",
+                date_published=applies_from,
+                external_id=celex,
+                note="The full AI Act text with all changes up to this date merged in. A new version means the law's text changed.",
+                categories=["other"],
+            )
+        )
+    return sorted(docs, key=lambda d: d.date_published, reverse=True)
 
 
 def is_relevant(celex: str) -> bool:

@@ -1,0 +1,29 @@
+# Pages we watch for changes. These have no news feed, but they change in place
+# when something important happens. Each was tested on Day 4: it loads for us,
+# its robots.txt allows it, and its fingerprint stays the same when nothing changes.
+#
+#   selector - the part of the page we fingerprint (skips menus and footers)
+
+pages:
+  - name: NIST AI Risk Management Framework page
+    url: https://www.nist.gov/itl/ai-risk-management-framework
+    selector: .nist-page__content
+    source: nist
+    framework: nist_ai_rmf
+    why: NIST says the AI RMF is being revised. This page changes when the new version or a new profile comes out.
+
+  - name: NIST AI RMF Playbook
+    url: https://airc.nist.gov/airmf-resources/playbook/
+    selector: main
+    source: nist
+    framework: nist_ai_rmf
+    why: The page says the Playbook will be updated after the AI RMF is revised.
+
+  - name: Colorado SB 26-189 bill page
+    url: https://leg.colorado.gov/bills/sb26-189
+    selector: main
+    source: state_laws
+    framework: us_state
+    why: Shows the bill's status and changes. Main duties start Jan 1, 2027.
+
+# Not watched (to-do): the California SB 53 page is behind a bot check.
