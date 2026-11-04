@@ -17,7 +17,7 @@ All 6 articles come from one law: the **EU AI Act**. Its official name is **Regu
 - In **July 2026**, a second law changed some of it: the **Digital Omnibus on AI**, Regulation (EU) 2026/1744. It mostly pushed deadlines back and added new bans.
 
 ### Why it matters
-- It applies to any company whose AI is **used in the EU**, even if the company is American. That includes Perplexity.
+- It applies to any company whose AI is **used in the EU**, even if the company is American. That includes American companies.
 - The fines are huge: up to **7% of a company's yearly sales worldwide**.
 - Other countries copy it. California's SB 53 borrows ideas from it.
 
@@ -28,7 +28,7 @@ All 6 articles come from one law: the **EU AI Act**. Its official name is **Regu
 - ⚠️ The easy site may not show the July 2026 changes yet. Where this matters, it's flagged below.
 
 ### Why you're reading these 6
-Perplexity makes **GPAI** (general-purpose AI). It's an AI that can do many tasks, not just one. These 6 articles are the core of what a GPAI company must know:
+A company that makes **GPAI** (general-purpose AI). It's an AI that can do many tasks, not just one. These 6 articles are the core of what a GPAI company must know:
 
 | Article | One line |
 |---|---|
@@ -43,12 +43,12 @@ Perplexity makes **GPAI** (general-purpose AI). It's an AI that can do many task
 Write **2–3 bullets per article, in your own words**. Use the "My notes" spot under each article. Try to cover:
 
 1. **What it says.** One plain sentence, as if you were telling a friend.
-2. **Does it apply to Perplexity, and how?** Yes, no, or maybe, and why.
+2. **Does it apply to the company, and how?** Yes, no, or maybe, and why.
 3. **The "so what".** One thing a compliance team would actually **do** because of this rule.
 
 **Good example:**
 > - Every GPAI company has to publish a summary of what data it trained on, using the EU's form.
-> - Applies to Perplexity: yes, if it trains or fine-tunes its own models.
+> - Applies to the company: yes, if it trains or fine-tunes its own models.
 > - So what: someone needs to own this summary and update it when the model changes.
 
 **Not so good:** copying the law's wording. If you can't say it simply, read it again.
@@ -85,7 +85,7 @@ A list of AI uses that are **not allowed at all** in the EU, no matter what. Exa
 **What to look for:**
 - The full list of bans. Count them.
 - The **exceptions**, especially for police use.
-- Could a general AI tool like Perplexity's be **misused** for any of these? (Think about the fake-image ban.)
+- Could a general AI tool like this one be **misused** for any of these? (Think about the fake-image ban.)
 
 **My notes:**
 -
@@ -139,13 +139,13 @@ Every company that makes a GPAI model must:
 
 **Started:** Aug 2, 2025. (Models already out before then have until Aug 2, 2027.)
 
-**Why we chose it:** **This is Perplexity's main checklist.** It's the most important article for this job.
+**Why we chose it:** **This is the main checklist for a GPAI company.** It's the most important article for this job.
 
 **What to look for:**
 - The **4 duties**. Could you list them from memory?
 - The **open-source exception**, and when it doesn't apply.
 - The mention of **codes of practice**. Following the EU's GPAI Code of Practice is one way to show you comply.
-- Think: Perplexity uses other companies' models **and** may build its own. When is it a "provider"?
+- Think: a company may use other companies' models **and** may build its own. When is it a "provider"?
 
 **Watch out:** the spec said "report energy consumption" was an Article 55 duty. Energy use is actually part of the **technical documents** in Annex XI, which ties to this article.
 
@@ -170,7 +170,7 @@ On top of Article 53, systemic-risk model makers must:
 
 **Started:** Aug 2, 2025.
 
-**Why we chose it:** If a model crosses the Article 51 line, these duties kick in. Big AI labs (OpenAI, Anthropic, Google) are in this group. Perplexity needs to know whether it is.
+**Why we chose it:** If a model crosses the Article 51 line, these duties kick in. Big AI labs (OpenAI, Anthropic, Google) are in this group. A GPAI company needs to know whether it is.
 
 **What to look for:**
 - The **4 extra duties**.
@@ -230,7 +230,7 @@ GPAI companies are fined by the **EU Commission directly**, not by each country.
 
 **Started:** Aug 2, 2026. This is a year **after** the GPAI rules started. That gap gave companies time to get ready.
 
-**Why we chose it:** **This is the fine that applies to Perplexity.** Since Aug 2, 2026, the EU can actually use it.
+**Why we chose it:** **This is the fine that applies to a GPAI company.** Since Aug 2, 2026, the EU can actually use it.
 
 **What to look for:**
 - **Who** fines (the Commission) and the **cap** (€15M / 3%).
