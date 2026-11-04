@@ -19,5 +19,6 @@ st.set_page_config(page_title="AI Regulation Tracker", page_icon="⚖️", layou
 
 pages = [
     st.Page("home.py", title="What's new", icon="🏠", default=True),
+    st.Page("timeline.py", title="Timeline", icon="📅", url_path="timeline"),
 ]
 st.navigation(pages).run()

@@ -1,5 +1,5 @@
-[theme]
-primaryColor = "#3355cc"
+# No [theme] section on purpose: setting a custom color locks Streamlit into light
+# mode. Without it, the dashboard follows the computer's light/dark setting.
 
 [client]
 # Hide developer buttons like "Deploy"; viewers only see the app.

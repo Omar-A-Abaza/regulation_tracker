@@ -145,6 +145,46 @@ def next_milestone(milestones: list[dict], today: date) -> dict | None:
     return next((m for m in milestones if m["date"] >= today), None)
 
 
+# --- timeline -------------------------------------------------------------
+
+JURISDICTIONS = {"EU": "EU", "US-CA": "California", "US-CO": "Colorado"}
+SOON_DAYS = 90
+# Each state has an icon and a label, so color is never the only clue.
+MILESTONE_STATES = {"done": "✅ In force", "soon": f"⏳ Within {SOON_DAYS} days", "later": "🗓️ Later"}
+
+
+def milestone_state(milestone: dict, today: date) -> str:
+    days = (milestone["date"] - today).days
+    return "done" if days < 0 else "soon" if days <= SOON_DAYS else "later"
+
+
+def days_label(when: date, today: date) -> str:
+    days = (when - today).days
+    if days == 0:
+        return "today"
+    unit = "day" if abs(days) == 1 else "days"
+    return f"in {days} {unit}" if days > 0 else f"{-days} {unit} ago"
+
+
+def filter_milestones(
+    milestones: list[dict], *, jurisdictions: list[str] | None = None, categories: list[str] | None = None
+) -> list[dict]:
+    """Empty filter lists mean "everything"."""
+    kept = []
+    for m in milestones:
+        if jurisdictions and m["jurisdiction"] not in jurisdictions:
+            continue
+        if categories and not set(m.get("categories", [])) & set(categories):
+            continue
+        kept.append(m)
+    return kept
+
+
+def moved_milestones(milestones: list[dict]) -> list[dict]:
+    """Deadlines a later law pushed back (they have an original_date)."""
+    return [m for m in milestones if m.get("original_date")]
+
+
 def time_ago(then: datetime, now: datetime) -> str:
     seconds = (now - then).total_seconds()
     if seconds < 60:
