@@ -61,18 +61,25 @@ now, today = utcnow(), date.today()
 
 # ---------------------------------------------------------------- sidebar
 
+# Filters can be set from the link, e.g. ?urgency=Action Required&range=All time, so a filtered view can be shared.
+link = st.query_params
+linked_categories = [c for c in link.get_all("category") if c in data.CATEGORIES]
+linked_urgency = [r for r in link.get_all("urgency") if r in data.RISK_LEVELS]
+range_options = list(data.DATE_RANGES)
+linked_range = range_options.index(link["range"]) if link.get("range") in range_options else 0
+
 with st.sidebar:
     st.header("Filters")
     st.caption("Leave a box empty to see everything.")
     frameworks = st.multiselect("Framework", list(data.FRAMEWORKS), format_func=data.FRAMEWORKS.get,
                                 placeholder="All frameworks")
     categories = st.multiselect("Category", list(data.CATEGORIES), format_func=data.CATEGORIES.get,
-                                placeholder="All categories")
+                                placeholder="All categories", default=linked_categories)
     sources = st.multiselect("Website", list(data.SOURCES), format_func=data.SOURCES.get,
                              placeholder="All websites")
     risk_levels = st.multiselect("Urgency", list(data.RISK_LEVELS), format_func=data.RISK_LEVELS.get,
-                                 placeholder="Any urgency")
-    range_label = st.selectbox("Date range", list(data.DATE_RANGES))
+                                 placeholder="Any urgency", default=linked_urgency)
+    range_label = st.selectbox("Date range", range_options, index=linked_range)
     query = st.text_input("Search", placeholder="e.g. copyright, FTC, Omnibus")
     st.divider()
     if st.button("Reload data", help="The page re-reads the database every 5 minutes. Click to do it now."):

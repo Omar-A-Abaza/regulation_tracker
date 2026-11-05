@@ -2,7 +2,7 @@
 
 > Automatic monitoring of AI regulation across the EU and the US, with a dashboard that answers one question first: **what changed this week?**
 
-![The "What's new" page](docs/images/home.png)
+![The "What's new" page, filtered to GPAI documents that need action, with the AI summary open](docs/images/home.png)
 
 ## Why this exists
 
@@ -35,7 +35,7 @@ The database starts with **14 hand-checked documents** (the AI Act, the GPAI Cod
 
 ## The dashboard
 
-**What's new:** the status message, new items this week, items needing action, the next deadline, and every recent update with its source, date, urgency, AI summary and tags. You can filter by framework, category (GPAI, high-risk, banned uses, fines and enforcement, and more), website, urgency, date range and search.
+**What's new:** the status message, new items this week, items needing action, the next deadline, and every recent update with its source, date, urgency, AI summary and tags. You can filter by framework, category (GPAI, high-risk, banned uses, fines and enforcement, and more), website, urgency, date range and search. Filters can also be set in the link, so a view can be shared: `?category=gpai&urgency=Action Required&range=All time`.
 
 **Timeline:** every AI Act phase-in date plus key US state deadlines, with days left or days since. Deadlines the EU pushed back are shown with their old and new dates.
 

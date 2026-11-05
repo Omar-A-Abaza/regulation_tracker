@@ -144,6 +144,20 @@ def test_page_shows_ai_summary_and_urgency(app_db):
     assert any(m.label == "Action Required" for m in at.metric)
 
 
+def test_filters_can_be_set_from_the_link(app_db):
+    st.cache_data.clear()
+    st.cache_resource.clear()
+    at = AppTest.from_file(APP, default_timeout=30)
+    at.query_params["urgency"] = "Action Required"
+    at.query_params["range"] = "All time"
+    at.run()
+    assert not at.exception
+    urgency = next(m for m in at.multiselect if m.label == "Urgency")
+    assert urgency.value == ["Action Required"]
+    assert at.selectbox[0].value == "All time"
+    assert any("No updates match" in i.value for i in at.info)  # the test document has no urgency
+
+
 def test_search_box_filters_the_list(app_db):
     at = run_app()
     at.text_input[0].input("nothing matches this").run()
