@@ -48,6 +48,13 @@ def test_search_looks_at_title_and_note():
     assert [d.id for d in data.filter_documents(DOCS, today=TODAY, query="trade commission")] == [2]
 
 
+def test_filter_by_urgency():
+    docs = [row(1), row(2), row(3)]
+    docs[0].risk_level, docs[1].risk_level = "Action Required", "Watch"
+    assert [d.id for d in data.filter_documents(docs, today=TODAY, risk_levels=["Action Required"])] == [1]
+    assert [d.id for d in data.filter_documents(docs, today=TODAY, risk_levels=["none"])] == [3]
+
+
 def test_search_understands_short_forms():
     assert [d.id for d in data.filter_documents(DOCS, today=TODAY, query="FTC")] == [2]
 
@@ -117,6 +124,24 @@ def test_page_warns_when_a_source_failed(app_db):
     at = run_app()
     assert not at.exception
     assert any("NIST" in w.value and "might be missing" in w.value for w in at.warning)
+
+
+def test_page_shows_ai_summary_and_urgency(app_db):
+    from database.models import Document
+    with repo.make_session(app_db) as s:
+        doc = s.query(Document).one()
+        doc.risk_level = "Action Required"
+        doc.summary_json = {"tldr": ["First bullet.", "Second bullet.", "Third bullet."],
+                            "who_is_affected": "AI providers", "key_deadline_date": "", "key_deadline": "",
+                            "actions_required": [], "risk_level": "Action Required", "categories": ["penalties"],
+                            "_meta": {"model": "claude-sonnet-5-5", "based_on": "full_text",
+                                      "summarized_at": "2026-11-04T10:00:00"}}
+        s.commit()
+    at = run_app()
+    assert not at.exception
+    text = " ".join(m.value for m in at.markdown)
+    assert "Action Required" in text and "First bullet." in text
+    assert any(m.label == "Action Required" for m in at.metric)
 
 
 def test_search_box_filters_the_list(app_db):

@@ -141,6 +141,20 @@ def get_new_documents(session: Session, days: int = 7) -> list[Document]:
     return [doc for doc in session.scalars(query) if is_new(doc, backfill_runs)]
 
 
+def get_unemailed_new(session: Session) -> list[Document]:
+    """Really new documents that haven't been in an update email yet."""
+    backfill_runs = first_run_ids(session)
+    query = select(Document).where(Document.notified_at.is_(None)).order_by(Document.date_detected.desc())
+    return [doc for doc in session.scalars(query) if is_new(doc, backfill_runs)]
+
+
+def mark_emailed(session: Session, docs: list[Document]) -> None:
+    now = utcnow()
+    for doc in docs:
+        doc.notified_at = now
+    session.commit()
+
+
 def last_fingerprint(session: Session, url: str) -> PageFingerprint | None:
     query = select(PageFingerprint).where(PageFingerprint.url == url).order_by(PageFingerprint.id.desc())
     return session.scalars(query).first()

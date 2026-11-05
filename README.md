@@ -24,6 +24,8 @@ The database starts with **14 hand-checked documents** (the AI Act, the GPAI Cod
 
 ## What it does
 
+- **Summarizes every document in plain English** with Claude Sonnet 5.5: a 3-bullet summary, who's affected, the key deadline, actions to take, and an urgency level (🔴 Action Required, 🟡 Watch, ⚪ Informational). Each document is summarized once and saved, so the cost stays at cents a month.
+- **Emails a weekly update** of what's new, with the summaries and the most urgent items first.
 - **Finds new documents automatically**, from official sources only.
 - **Spots changes, not just new items.** For example, when a watched page changes, it saves an update that quotes the new text, and when the EU publishes a new full-text version of the AI Act, it flags it.
 - **Tells "really new" apart from "old but newly found".** The first time a source is checked, everything looks new. The tracker only counts later finds as news, so the weekly view stays honest.
@@ -33,7 +35,7 @@ The database starts with **14 hand-checked documents** (the AI Act, the GPAI Cod
 
 ## The dashboard
 
-**What's new:** the status message, new items this week, the next deadline, and every recent update with its source, date, a plain-English note and tags. You can filter by framework, category (GPAI, high-risk, banned uses, fines and enforcement, and more), website, date range and search.
+**What's new:** the status message, new items this week, items needing action, the next deadline, and every recent update with its source, date, urgency, AI summary and tags. You can filter by framework, category (GPAI, high-risk, banned uses, fines and enforcement, and more), website, urgency, date range and search.
 
 **Timeline:** every AI Act phase-in date plus key US state deadlines, with days left or days since. Deadlines the EU pushed back are shown with their old and new dates.
 
@@ -71,7 +73,9 @@ flowchart LR
     A & B & C & D --> S[Scrapers<br/>+ AI filters + tagging]
     E --> W[Page watcher<br/>+ change summary]
     S & W --> DB[(SQLite database<br/>documents · page fingerprints · scrape log)]
+    DB <--> AI[AI summaries<br/>Claude Sonnet 5.5]
     DB --> UI[Streamlit dashboard<br/>What's new · Timeline]
+    DB --> M[Weekly email]
 ```
 
 ## Setup
@@ -90,25 +94,58 @@ python main.py scrape     # check every source (about 30 seconds)
 streamlit run dashboard/app.py    # open http://localhost:8501
 ```
 
+### AI summaries and email (optional)
+
+Copy the settings file and fill in your keys. `.env` is on git's ignore list, so keys never get uploaded.
+
+```bash
+cp .env.example .env
+code .env    # or any editor
+```
+
+| Setting | What it is |
+|---|---|
+| `ANTHROPIC_API_KEY` | Your Anthropic API key (for the summaries) |
+| `SUMMARY_BUDGET_USD` | The most one `summarize` run may spend (default $1.50) |
+| `SMTP_USER`, `SMTP_PASSWORD` | The Gmail address that sends the email, and a Gmail [app password](https://myaccount.google.com/apppasswords) |
+| `ALERT_TO` | Who gets the email (comma-separated) |
+
+Then:
+
+```bash
+python main.py summarize --dry-run    # see the cost first (spends nothing)
+python main.py summarize              # shows the estimate and asks before spending
+python main.py digest --test          # send yourself a test email
+```
+
 ### Commands
 
-| Command | What it does |
-|---|---|
-| `python main.py scrape` | Check every source and watched page |
-| `python main.py scrape --source nist` | Check one source (`eurlex`, `eurlex_versions`, `eu_ai_office`, `nist`, `federal_register`, `pages`) |
-| `python main.py new` | List what's really new (last 7 days; `--days 30` for more) |
-| `python main.py list` | List the latest documents |
-| `python main.py runs` | Show the scrape log, including any errors |
+| Command | What it does | Costs money? |
+|---|---|---|
+| `python main.py scrape` | Check every source and watched page | No |
+| `python main.py scrape --source nist` | Check one source (`eurlex`, `eurlex_versions`, `eu_ai_office`, `nist`, `federal_register`, `pages`) | No |
+| `python main.py summarize --dry-run` | Show what summaries would cost | No |
+| `python main.py summarize` | Summarize every document that doesn't have a summary yet (asks first) | Yes, cents |
+| `python main.py digest` | Email what's new since the last email (`--preview` to just print it) | No |
+| `python main.py weekly` | Scrape, summarize what's new, and email it. The one command a weekly job runs. | Only for new items |
+| `python main.py new` | List what's really new (last 7 days; `--days 30` for more) | No |
+| `python main.py list` | List the latest documents | No |
+| `python main.py runs` | Show the scrape log, including any errors | No |
+
+### What the summaries cost
+
+Each document is summarized **once** and saved. It's only redone if its text changes. A typical document costs about 1–2 cents with Claude Sonnet 5.5, and summarizing all ~70 existing documents costs about $1.50. After that, only new documents cost anything, which comes to cents a month. Every run shows an estimate first, has a spending cap, and skips whole-law documents over 40,000 tokens unless you ask for them (`--include-large`).
 
 ## Project structure
 
 ```
 scrapers/      one file per source, plus shared tools (polite HTTP client, RSS reader)
-processors/    tagging (classifier.py) and change summaries (differ.py)
+processors/    AI summaries (summarizer.py), full text (fulltext.py), tagging, change summaries
+notifications/ the update email (email_digest.py)
 database/      the 3 tables and the helper functions everything uses
 dashboard/     the Streamlit app: pages, data loading, and charts
 data/          the timeline, the starting documents, and the list of watched pages
-tests/         66 automated tests, using saved copies of real responses
+tests/         104 automated tests, using saved copies of real responses, a fake AI and a fake mail server
 docs/          build notes, the fact check, and the AI Act summary
 main.py        the commands above
 ```
@@ -119,7 +156,7 @@ main.py        the commands above
 pytest
 ```
 
-The tests run offline, against saved copies of real responses from each source. They cover the parsers, the AI filters, de-duplication, change detection, the "really new" logic, the scrape log, and both dashboard pages end to end.
+The tests run offline, against saved copies of real responses from each source. They cover the parsers, the AI filters, de-duplication, change detection, the "really new" logic, the scrape log, the summarizer and its money safety rails (with a fake AI, so tests never spend credit), the update email (with a fake mail server), and both dashboard pages end to end.
 
 ## Design choices
 
@@ -131,18 +168,18 @@ The tests run offline, against saved copies of real responses from each source. 
 ## Limitations and roadmap
 
 **Not built yet:**
-- **AI summaries.** Each new document will get a short summary: who it affects, key deadlines, required actions, and an urgency level. The database is already set up for this.
 - **A cross-framework map** linking EU AI Act articles to NIST AI RMF and ISO/IEC 42001.
 - **A GPAI compliance checklist** and a 10²⁵ FLOP threshold calculator.
 - **An enforcement tracker** (fines and investigations under AI laws).
-- **Alerts** (Slack, Teams or email) and **a daily schedule**, to run on a server (EC2 or a scheduled cloud function).
+- **A weekly schedule on a server** (EC2 or a scheduled cloud function) to run `python main.py weekly`.
 - **More sources:** the UK AI Security Institute, the FTC, state legislatures, and the OECD.
 
 **Known limits:**
 - **The EU AI Office feed only holds its 10 newest items**, so the tracker needs to run at least every week or two not to miss any.
-- **Tagging is keyword-based for now**, so about a third of documents are tagged "Other". The AI summaries will replace it.
+- **Some documents can't be fetched in full** (EU AI Office pages block programs, a few EU corrections have no text version, NIST's frameworks are PDFs). Their summaries are written from the title and description, and say so.
+- **Until a document is summarized, its tags come from keyword matching**, which is rougher.
 - **California's bill pages are behind a bot check**, so SB 53 is tracked through the starting data only.
 
 ## Disclaimer
 
-This is a monitoring tool, not legal advice. Always check the official source before acting on anything it shows.
+This is a monitoring tool, not legal advice. The summaries are written by AI and can be wrong. Always check the official source before acting on anything it shows.

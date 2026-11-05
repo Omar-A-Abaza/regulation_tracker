@@ -31,6 +31,9 @@ RUN_SOURCES = {
     "nist": "NIST", "federal_register": "Federal Register", "pages": "Watched pages",
 }
 DATE_RANGES = {"Last 30 days": 30, "Last 90 days": 90, "Last 12 months": 365, "All time": None}
+# Urgency from the AI summary. "none" = not summarized yet.
+RISK_LEVELS = {"Action Required": "🔴 Action Required", "Watch": "🟡 Watch",
+               "Informational": "⚪ Informational", "none": "Not summarized yet"}
 # Short forms people type, and the full names our documents use.
 SEARCH_ALIASES = {
     "ftc": "federal trade commission",
@@ -55,6 +58,7 @@ class DocRow:
     status: str  # "new", "backfill" (found on a scraper's first run) or "seed" (starting data)
     categories: list[str] = field(default_factory=list)
     summary: dict | None = None
+    risk_level: str | None = None
 
     @property
     def is_new(self) -> bool:
@@ -80,7 +84,7 @@ def load_documents(engine: Engine) -> list[DocRow]:
             rows.append(DocRow(
                 id=doc.id, source=doc.source, title=doc.title, url=doc.url, date_published=doc.date_published,
                 date_detected=doc.date_detected, framework=doc.framework, note=doc.note, status=status,
-                categories=list(doc.categories or []), summary=doc.summary_json,
+                categories=list(doc.categories or []), summary=doc.summary_json, risk_level=doc.risk_level,
             ))
     return sort_newest_first(rows)
 
@@ -99,6 +103,7 @@ def filter_documents(
     sources: list[str] | None = None,
     days: int | None = None,
     query: str = "",
+    risk_levels: list[str] | None = None,
 ) -> list[DocRow]:
     """Empty filter lists mean "everything"."""
     query = query.strip().lower()
@@ -111,6 +116,8 @@ def filter_documents(
         if categories and not set(doc.categories) & set(categories):
             continue
         if sources and doc.source not in sources:
+            continue
+        if risk_levels and (doc.risk_level or "none") not in risk_levels:
             continue
         if since and (doc.date_published is None or doc.date_published < since):
             continue

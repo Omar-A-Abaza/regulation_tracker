@@ -6,18 +6,30 @@
   python main.py list                    print the latest documents
   python main.py new                     print what's really new (last 7 days)
   python main.py runs                    print the scrape log
+  python main.py summarize --dry-run     show what AI summaries would cost (spends nothing)
+  python main.py summarize               write AI summaries for documents that don't have one
+  python main.py digest                  email what's new since the last email (--preview to just print it)
+  python main.py weekly                  scrape, summarize what's new, and email it
 """
 import argparse
+import os
+import smtplib
 import sys
 from datetime import date
 from pathlib import Path
 
+import anthropic
 import yaml
 from dotenv import load_dotenv
+from sqlalchemy import select
 
 from database import repository as repo
+from database.models import Document
+from notifications import email_digest
+from processors import summarizer as summ
 from processors.classifier import classify
 from processors.differ import summarize_change
+from processors.fulltext import FullTextFetcher, save_text
 from scrapers.base import BaseScraper, DocumentCandidate
 from scrapers.eu_ai_office import EuAiOfficeScraper
 from scrapers.eurlex import EurLexScraper, EurLexVersionsScraper
@@ -172,6 +184,172 @@ def cmd_runs(engine, limit: int) -> None:
                 print(f"       {run.error[:150]}")
 
 
+NO_KEY_HELP = """No API key found. To add yours:
+  1. cp .env.example .env      (only the first time)
+  2. code .env                 (opens it in VS Code)
+  3. Fill in the line:  ANTHROPIC_API_KEY=sk-ant-...
+Nothing was spent."""
+
+NO_EMAIL_HELP = """Email isn't set up yet. In your .env file, fill in:
+  SMTP_USER=your.address@gmail.com
+  SMTP_PASSWORD=your 16-letter Gmail app password
+  ALERT_TO=where.to.send@example.com"""
+
+
+def fetch_missing_text(session, docs: list[Document], fetcher: FullTextFetcher | None = None) -> None:
+    """Download the full text of documents that don't have it yet (free: just reading public pages)."""
+    missing = [d for d in docs if not d.raw_text]
+    if not missing:
+        return
+    print(f"Getting full text for {len(missing)} documents...")
+    fetcher = fetcher or FullTextFetcher()
+    for doc in missing:
+        try:
+            text = fetcher.text_for(doc)
+        except Exception as e:
+            print(f"  couldn't get the text of \"{doc.title[:60]}\" ({type(e).__name__}); will use its description")
+            continue
+        if text:
+            save_text(doc, text)
+    fetcher.close()
+    session.commit()
+
+
+def plan_summaries(docs: list[Document], summarizer, today: date, *, limit: int | None,
+                   include_large: bool) -> summ.Plan:
+    """Count tokens and pick which documents fit. Without a key, uses a rough estimate."""
+    plan = summ.Plan(docs=[], tokens={}, too_large=[], exact=summarizer is not None)
+    for doc in docs:
+        if limit and len(plan.docs) >= limit:
+            break
+        tokens = (summarizer.count_tokens(doc, today) if summarizer
+                  else round(len(summ.build_input(doc, today)) / 3.5))  # rough: no key to count with
+        plan.tokens[doc.id] = tokens
+        if tokens > summ.MAX_INPUT_TOKENS and not include_large:
+            plan.too_large.append(doc)
+        else:
+            plan.docs.append(doc)
+    return plan
+
+
+def cmd_summarize(engine, *, dry_run=False, limit=None, yes=False, include_large=False, only_new=False,
+                  summarizer=None, fetcher=None, confirm=input, today=None) -> bool:
+    today = today or date.today()
+    budget = summ.budget_from_env()
+    with repo.make_session(engine) as session:
+        backfill_runs = repo.first_run_ids(session)
+        docs = [d for d in session.scalars(select(Document)) if summ.needs_summary(d)]
+        if only_new:
+            docs = [d for d in docs if repo.is_new(d, backfill_runs)]
+        # Really new documents first, then newest first.
+        docs.sort(key=lambda d: (not repo.is_new(d, backfill_runs), -(d.date_published or date.min).toordinal()))
+        if not docs:
+            print("Nothing to summarize: every document already has a summary.")
+            return True
+
+        fetch_missing_text(session, docs, fetcher)
+        has_key = summarizer is not None or bool(os.getenv("ANTHROPIC_API_KEY"))
+        if has_key and summarizer is None:
+            summarizer = summ.Summarizer()
+        try:
+            plan = plan_summaries(docs, summarizer, today, limit=limit, include_large=include_large)
+        except anthropic.AuthenticationError:
+            print("Your API key wasn't accepted. Check ANTHROPIC_API_KEY in .env. Nothing was spent.")
+            return False
+        except anthropic.APIError as e:
+            print(f"Couldn't count tokens ({type(e).__name__}: {e}). Nothing was spent.")
+            return False
+
+        all_summarized = session.scalars(select(Document).where(Document.summary_json.is_not(None))).all()
+        avg_output = summ.average_output_tokens(list(all_summarized))
+        estimate = plan.estimated_cost(avg_output)
+        print(f"\nSummaries with Claude Sonnet 5.5: {len(plan.docs)} documents")
+        if plan.too_large:
+            print(f"  Skipped {len(plan.too_large)} very long documents (over {summ.MAX_INPUT_TOKENS:,} tokens). "
+                  "Add --include-large to include them:")
+            for doc in plan.too_large:
+                print(f"    - {doc.title[:70]} ({plan.tokens[doc.id]:,} tokens)")
+        input_tokens = sum(plan.tokens[d.id] for d in plan.docs)
+        kind = "counted" if plan.exact else "rough estimate, add your API key for an exact count"
+        print(f"  Text to read: {input_tokens:,} tokens ({kind})")
+        print(f"  Estimated cost: about ${estimate:.2f}  (spending cap for this run: ${budget:.2f})")
+        if estimate > budget:
+            print("  The run will stop when it reaches the cap. Run it again later to continue.")
+        if dry_run or not plan.docs:
+            print("Nothing was spent.")
+            return True
+        if not has_key:
+            print(NO_KEY_HELP)
+            return False
+        if not yes and confirm("Go ahead? (y/n) ").strip().lower() not in ("y", "yes"):
+            print("Cancelled. Nothing was spent.")
+            return True
+
+        spent, done, failed = 0.0, 0, 0
+        for doc in plan.docs:
+            if spent + summ.cost(plan.tokens[doc.id], avg_output) > budget:
+                print(f"Stopped at the spending cap (${budget:.2f}). Run again to continue.")
+                break
+            try:
+                summary = summarizer.summarize(doc, today)
+            except (anthropic.AuthenticationError, anthropic.PermissionDeniedError):
+                print("Your API key wasn't accepted. Check ANTHROPIC_API_KEY in .env.")
+                failed += 1
+                break
+            except (summ.SummaryError, anthropic.APIError, ValueError) as e:
+                print(f"  FAILED  {doc.title[:70]}: {e}")
+                failed += 1
+                continue
+            summ.apply_summary(doc, summary)
+            session.commit()
+            spent += summary["_meta"]["cost_usd"]
+            done += 1
+            print(f"  {email_digest.RISK_ICONS[summary['risk_level']]} {summary['risk_level']:<15} "
+                  f"${summary['_meta']['cost_usd']:.3f}  {doc.title[:70]}")
+        print(f"\nDone: {done} summarized, {failed} failed. Spent ${spent:.2f}.")
+        return failed == 0
+
+
+def cmd_digest(engine, *, preview=False, test=False, settings=None, smtp_class=smtplib.SMTP, today=None) -> bool:
+    """Email what's new since the last email. --test sends the 3 latest summaries without marking anything."""
+    today = today or date.today()
+    with repo.make_session(engine) as session:
+        if test:
+            query = (select(Document).where(Document.summary_json.is_not(None))
+                     .order_by(Document.date_published.desc().nulls_last()).limit(3))
+            docs = list(session.scalars(query))
+        else:
+            docs = repo.get_unemailed_new(session)
+        if not docs:
+            print("Nothing new to send." if not test else "No summaries yet. Run `python main.py summarize` first.")
+            return True
+        if preview:
+            print(email_digest.build_text(docs, today))
+            return True
+        settings = settings or email_digest.EmailSettings.from_env()
+        if settings is None:
+            print(NO_EMAIL_HELP + "\n\nHere's what the email would say:\n")
+            print(email_digest.build_text(docs, today))
+            return False
+        try:
+            email_digest.send(docs, settings, today, smtp_class=smtp_class)
+        except (smtplib.SMTPException, OSError) as e:
+            print(f"The email couldn't be sent: {type(e).__name__}: {e}")
+            return False
+        if not test:
+            repo.mark_emailed(session, docs)
+        print(f"Sent {'a test email' if test else 'the update'} about {len(docs)} documents to {', '.join(settings.to)}.")
+        return True
+
+
+def cmd_weekly(engine) -> bool:
+    """The one command a weekly job runs: check every source, summarize what's new, email it."""
+    scraped = cmd_scrape(engine, "all")
+    summarized = cmd_summarize(engine, only_new=True, yes=True)
+    emailed = cmd_digest(engine)
+    return scraped and summarized and emailed
+
+
 def main(argv: list[str] | None = None) -> int:
     load_dotenv(ROOT / ".env")
     parser = argparse.ArgumentParser(description="AI Regulation Tracker")
@@ -186,6 +364,15 @@ def main(argv: list[str] | None = None) -> int:
     new.add_argument("--days", type=int, default=7)
     runs = sub.add_parser("runs", help="print the scrape log")
     runs.add_argument("--limit", type=int, default=20)
+    summarize = sub.add_parser("summarize", help="write AI summaries (shows the cost and asks first)")
+    summarize.add_argument("--dry-run", action="store_true", help="only show what it would cost")
+    summarize.add_argument("--limit", type=int, help="summarize at most this many documents")
+    summarize.add_argument("--yes", action="store_true", help="don't ask before spending")
+    summarize.add_argument("--include-large", action="store_true", help="include very long documents")
+    digest = sub.add_parser("digest", help="email what's new since the last email")
+    digest.add_argument("--preview", action="store_true", help="print the email instead of sending it")
+    digest.add_argument("--test", action="store_true", help="send the 3 latest summaries as a test")
+    sub.add_parser("weekly", help="scrape, summarize what's new, and email it")
     args = parser.parse_args(argv)
 
     engine = repo.get_engine()
@@ -203,6 +390,14 @@ def main(argv: list[str] | None = None) -> int:
         cmd_new(engine, args.days)
     elif args.command == "runs":
         cmd_runs(engine, args.limit)
+    elif args.command == "summarize":
+        ok = cmd_summarize(engine, dry_run=args.dry_run, limit=args.limit, yes=args.yes,
+                           include_large=args.include_large)
+        return 0 if ok else 1
+    elif args.command == "digest":
+        return 0 if cmd_digest(engine, preview=args.preview, test=args.test) else 1
+    elif args.command == "weekly":
+        return 0 if cmd_weekly(engine) else 1
     return 0
 
 
