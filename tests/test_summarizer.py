@@ -220,6 +220,25 @@ def test_full_text_is_fetched_and_saved_first(engine):
     assert d.summary_json["_meta"]["based_on"] == "full_text"
 
 
+def test_redo_resummarizes_only_that_urgency(engine):
+    run(engine, FakeClient(), yes=True)  # all three rated "Action Required"
+    with repo.make_session(engine) as s:
+        s.query(Document).filter_by(title="Doc 0").one().risk_level = "Watch"
+        s.commit()
+    client = FakeClient({**GOOD_ANSWER, "risk_level": "Informational"})
+    run(engine, client, yes=True, redo="Action Required")
+    assert len(client.created) == 2  # Doc 1 and Doc 2, even though they already had summaries
+    with repo.make_session(engine) as s:
+        levels = {d.title: d.risk_level for d in s.query(Document)}
+    assert levels == {"Doc 0": "Watch", "Doc 1": "Informational", "Doc 2": "Informational"}
+
+
+def test_instructions_rule_out_one_off_comment_periods():
+    assert "NOT for" in summ.SYSTEM_PROMPT and "webinars" in summ.SYSTEM_PROMPT
+    meta = summ.Summarizer(FakeClient()).summarize(doc(), TODAY)["_meta"]
+    assert meta["prompt_version"] == summ.PROMPT_VERSION
+
+
 def test_a_failed_summary_is_not_saved_and_the_run_continues(engine):
     client = FakeClient(stop_reason="refusal")
     assert run(engine, client, yes=True) is False

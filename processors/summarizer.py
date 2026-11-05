@@ -13,6 +13,8 @@ from processors.classifier import FALLBACK as FALLBACK_CATEGORY
 from scrapers.page_watcher import fingerprint
 
 MODEL = "claude-sonnet-5-5"
+# Bump when the instructions change, so each summary records which version wrote it.
+PROMPT_VERSION = 2
 PRICE_PER_MILLION = {"input": 2.00, "output": 10.00}  # USD, Claude Sonnet 5.5
 MAX_INPUT_TOKENS = 40_000  # bigger documents are whole laws; skipped unless asked for
 DEFAULT_BUDGET_USD = 1.50
@@ -39,11 +41,17 @@ Empty if there is none.
 - actions_required: up to 3 concrete steps an AI company should take because of this document. \
 Empty list if none.
 - risk_level, for an AI company:
-  - "Action Required": creates or changes binding obligations or deadlines for AI companies, or opens a \
-consultation or comment period they should respond to.
-  - "Watch": could lead to obligations later (proposals, drafts, guidance, reviews, enforcement against \
-others).
-  - "Informational": background, research, funding, events, or corrections with no practical effect.
+  - "Action Required": creates or changes binding obligations, or sets a deadline for them, that apply \
+broadly to companies that build or offer AI models or AI products. For example: laws, regulations, \
+official guidance on how a law applies, required templates, or a formal consultation on such rules. \
+NOT for: agreements or contracts with one agency, calls for partners or proposals, grants or funding, \
+webinars or events, research, or comment periods on a single project. Rate those "Watch" or \
+"Informational", even if they have a deadline.
+  - "Watch": could lead to obligations for AI companies later (proposals, drafts, voluntary frameworks \
+and guidance, reviews of rules, enforcement against other companies), or a comment period or call for \
+input an AI company may want to join.
+  - "Informational": background, research, funding, events, partnerships, or corrections with no \
+practical effect.
 - categories: every one that fits: "gpai" (general-purpose AI models), "high_risk" (high-risk AI systems), \
 "prohibited" (banned AI practices), "penalties" (fines and enforcement), "transparency" (telling people \
 about AI, labeling AI content), "governance" (frameworks, standards, oversight bodies, policy). \
@@ -161,6 +169,7 @@ class Summarizer:
         usage = response.usage
         summary["_meta"] = {
             "model": response.model,
+            "prompt_version": PROMPT_VERSION,
             "summarized_at": utcnow().isoformat(timespec="seconds"),
             "based_on": "full_text" if doc.raw_text else "description_only",
             "input_tokens": usage.input_tokens,

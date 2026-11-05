@@ -126,6 +126,7 @@ python main.py digest --test          # send yourself a test email
 | `python main.py scrape --source nist` | Check one source (`eurlex`, `eurlex_versions`, `eu_ai_office`, `nist`, `federal_register`, `pages`) | No |
 | `python main.py summarize --dry-run` | Show what summaries would cost | No |
 | `python main.py summarize` | Summarize every document that doesn't have a summary yet (asks first) | Yes, cents |
+| `python main.py summarize --redo "Action Required"` | Re-summarize documents with one urgency level, e.g. after changing the instructions | Yes, cents |
 | `python main.py digest` | Email what's new since the last email (`--preview` to just print it) | No |
 | `python main.py weekly` | Scrape, summarize what's new, and email it. The one command a weekly job runs. | Only for new items |
 | `python main.py new` | List what's really new (last 7 days; `--days 30` for more) | No |
@@ -145,7 +146,7 @@ notifications/ the update email (email_digest.py)
 database/      the 3 tables and the helper functions everything uses
 dashboard/     the Streamlit app: pages, data loading, and charts
 data/          the timeline, the starting documents, and the list of watched pages
-tests/         104 automated tests, using saved copies of real responses, a fake AI and a fake mail server
+tests/         107 automated tests, using saved copies of real responses, a fake AI and a fake mail server
 docs/          build notes, the fact check, and the AI Act summary
 main.py        the commands above
 ```

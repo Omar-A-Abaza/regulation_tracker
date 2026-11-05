@@ -49,6 +49,13 @@ Week 2 adds **AI summaries** (Claude Sonnet 5.5) and a **weekly update email**.
 - Each document shows its **urgency badge** and **3-bullet summary**. **Details** opens who's affected, the deadline, and what to do.
 - New **Action Required** number box (last 90 days) and an **Urgency** filter.
 
+## The real run
+
+- **72 summaries, 0 failures, $0.93.** The estimate said $1.58, so it runs cautious.
+- **One fix after reviewing the results:** the first instructions said any comment period = Action Required. That put a Coast Guard research agreement and a NIST webinar at the top of the list. The rule now says Action Required is only for binding rules that apply broadly to AI companies, not one-off agreements, webinars, grants or single-project comment periods.
+- **Re-rated the 9 Action Required items** with `summarize --redo "Action Required"` for **$0.11**. The Coast Guard agreement moved to Informational, and the webinar and a request for input moved to Watch. 6 stayed Action Required: the EU enforcement rules, the GPAI guidelines, the training-data template, California SB 53, Colorado SB 26-189, and the federal AI procurement order.
+- **Total for Week 2: $1.04.**
+
 ## Tests
 
-104 tests pass. The summarizer is tested with a **fake AI** and the email with a **fake mail server**, so tests never spend credit or send mail.
+107 tests pass. The summarizer is tested with a **fake AI** and the email with a **fake mail server**, so tests never spend credit or send mail.

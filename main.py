@@ -233,12 +233,16 @@ def plan_summaries(docs: list[Document], summarizer, today: date, *, limit: int 
 
 
 def cmd_summarize(engine, *, dry_run=False, limit=None, yes=False, include_large=False, only_new=False,
-                  summarizer=None, fetcher=None, confirm=input, today=None) -> bool:
+                  redo=None, summarizer=None, fetcher=None, confirm=input, today=None) -> bool:
+    """`redo` re-summarizes documents with that urgency level (e.g. after the instructions change)."""
     today = today or date.today()
     budget = summ.budget_from_env()
     with repo.make_session(engine) as session:
         backfill_runs = repo.first_run_ids(session)
-        docs = [d for d in session.scalars(select(Document)) if summ.needs_summary(d)]
+        if redo:
+            docs = list(session.scalars(select(Document).where(Document.risk_level == redo)))
+        else:
+            docs = [d for d in session.scalars(select(Document)) if summ.needs_summary(d)]
         if only_new:
             docs = [d for d in docs if repo.is_new(d, backfill_runs)]
         # Really new documents first, then newest first.
@@ -369,6 +373,8 @@ def main(argv: list[str] | None = None) -> int:
     summarize.add_argument("--limit", type=int, help="summarize at most this many documents")
     summarize.add_argument("--yes", action="store_true", help="don't ask before spending")
     summarize.add_argument("--include-large", action="store_true", help="include very long documents")
+    summarize.add_argument("--redo", choices=summ.RISK_LEVELS, metavar="URGENCY",
+                           help='re-summarize documents with this urgency, e.g. --redo "Action Required"')
     digest = sub.add_parser("digest", help="email what's new since the last email")
     digest.add_argument("--preview", action="store_true", help="print the email instead of sending it")
     digest.add_argument("--test", action="store_true", help="send the 3 latest summaries as a test")
@@ -392,7 +398,7 @@ def main(argv: list[str] | None = None) -> int:
         cmd_runs(engine, args.limit)
     elif args.command == "summarize":
         ok = cmd_summarize(engine, dry_run=args.dry_run, limit=args.limit, yes=args.yes,
-                           include_large=args.include_large)
+                           include_large=args.include_large, redo=args.redo)
         return 0 if ok else 1
     elif args.command == "digest":
         return 0 if cmd_digest(engine, preview=args.preview, test=args.test) else 1
