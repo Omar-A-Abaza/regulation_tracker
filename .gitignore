@@ -1,5 +1,8 @@
 .env
+# Databases stay local, except the app's own: the hosted dashboard reads it, and the
+# "really new vs newly found" logic needs its history.
 data/*.db
+!data/tracker.db
 __pycache__/
 *.pyc
 .pytest_cache/

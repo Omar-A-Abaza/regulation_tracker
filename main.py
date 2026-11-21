@@ -9,7 +9,7 @@
   python main.py summarize --dry-run     show what AI summaries would cost (spends nothing)
   python main.py summarize               write AI summaries for documents that don't have one
   python main.py digest                  email what's new since the last email (--preview to just print it)
-  python main.py weekly                  scrape, summarize what's new, and email it
+  python main.py weekly --yes            scrape, summarize what's new, and email it (--yes: don't ask)
 """
 import argparse
 import os
@@ -137,12 +137,17 @@ def run_page_watch(engine, watcher: PageWatcher | None = None, pages: list[Watch
     return not errors
 
 
-def cmd_scrape(engine, source: str) -> bool:
+def scrape_results(engine, source: str) -> list[bool]:
+    """Run the scrapers for `source` and return whether each one worked."""
     names = list(SCRAPERS) if source == "all" else [] if source == "pages" else [source]
     results = [run_scraper(engine, SCRAPERS[name]) for name in names]
     if source in ("all", "pages"):
         results.append(run_page_watch(engine))
-    return all(results)
+    return results
+
+
+def cmd_scrape(engine, source: str) -> bool:
+    return all(scrape_results(engine, source))
 
 
 def cmd_list(engine, limit: int) -> None:
@@ -232,9 +237,20 @@ def plan_summaries(docs: list[Document], summarizer, today: date, *, limit: int 
     return plan
 
 
+def can_ask() -> bool:
+    """True when someone is at a terminal to answer "Go ahead?"."""
+    return sys.stdin is not None and sys.stdin.isatty()
+
+
 def cmd_summarize(engine, *, dry_run=False, limit=None, yes=False, include_large=False, only_new=False,
-                  redo=None, summarizer=None, fetcher=None, confirm=input, today=None) -> bool:
-    """`redo` re-summarizes documents with that urgency level (e.g. after the instructions change)."""
+                  redo=None, summarizer=None, fetcher=None, confirm=None, today=None) -> bool:
+    """`redo` re-summarizes documents with that urgency level (e.g. after the instructions change).
+    Asks before spending, unless `yes` is set or there's no terminal to ask (a scheduled job).
+    The spending cap (SUMMARY_BUDGET_USD) applies either way."""
+    if confirm is None:
+        if not can_ask():
+            yes = True
+        confirm = input
     today = today or date.today()
     budget = summ.budget_from_env()
     with repo.make_session(engine) as session:
@@ -285,7 +301,9 @@ def cmd_summarize(engine, *, dry_run=False, limit=None, yes=False, include_large
         if not has_key:
             print(NO_KEY_HELP)
             return False
-        if not yes and confirm("Go ahead? (y/n) ").strip().lower() not in ("y", "yes"):
+        if yes:
+            print(f"Going ahead without asking (spending cap ${budget:.2f}).")
+        elif confirm("Go ahead? (y/n) ").strip().lower() not in ("y", "yes"):
             print("Cancelled. Nothing was spent.")
             return True
 
@@ -346,12 +364,21 @@ def cmd_digest(engine, *, preview=False, test=False, settings=None, smtp_class=s
         return True
 
 
-def cmd_weekly(engine) -> bool:
-    """The one command a weekly job runs: check every source, summarize what's new, email it."""
-    scraped = cmd_scrape(engine, "all")
-    summarized = cmd_summarize(engine, only_new=True, yes=True)
-    emailed = cmd_digest(engine)
-    return scraped and summarized and emailed
+def cmd_weekly(engine, *, yes=False, summarizer=None, fetcher=None, settings=None, smtp_class=smtplib.SMTP,
+               scrape=scrape_results, today=None) -> bool:
+    """The one command a weekly job runs: check every source, summarize what's new, email it.
+
+    Fails only if every source failed, or the summaries or the email failed. If just some
+    sources fail, that's logged in the scrape log and shown on the dashboard."""
+    results = scrape(engine, "all")
+    if results and not any(results):
+        print("Every source failed. Nothing was checked this week.")
+    elif not all(results):
+        print(f"{results.count(False)} of {len(results)} sources failed (see `python main.py runs`). "
+              "Carrying on with the rest.")
+    summarized = cmd_summarize(engine, only_new=True, yes=yes, summarizer=summarizer, fetcher=fetcher, today=today)
+    emailed = cmd_digest(engine, settings=settings, smtp_class=smtp_class, today=today)
+    return any(results) and summarized and emailed
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -378,7 +405,8 @@ def main(argv: list[str] | None = None) -> int:
     digest = sub.add_parser("digest", help="email what's new since the last email")
     digest.add_argument("--preview", action="store_true", help="print the email instead of sending it")
     digest.add_argument("--test", action="store_true", help="send the 3 latest summaries as a test")
-    sub.add_parser("weekly", help="scrape, summarize what's new, and email it")
+    weekly = sub.add_parser("weekly", help="scrape, summarize what's new, and email it")
+    weekly.add_argument("--yes", action="store_true", help="don't ask before spending (the cap still applies)")
     args = parser.parse_args(argv)
 
     engine = repo.get_engine()
@@ -403,7 +431,7 @@ def main(argv: list[str] | None = None) -> int:
     elif args.command == "digest":
         return 0 if cmd_digest(engine, preview=args.preview, test=args.test) else 1
     elif args.command == "weekly":
-        return 0 if cmd_weekly(engine) else 1
+        return 0 if cmd_weekly(engine, yes=args.yes) else 1
     return 0
 
 

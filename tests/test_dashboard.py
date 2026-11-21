@@ -1,3 +1,5 @@
+import json
+import re
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -68,16 +70,6 @@ def test_sort_puts_undated_last():
     assert [d.id for d in data.sort_newest_first(DOCS)] == [1, 2, 3]
 
 
-def test_next_milestone():
-    milestones = [{"date": date(2026, 8, 2), "title": "past"}, {"date": date(2026, 12, 2), "title": "next"}]
-    assert data.next_milestone(milestones, TODAY)["title"] == "next"
-    assert data.next_milestone(milestones, date(2027, 1, 1)) is None
-
-
-def test_real_timeline_has_a_next_deadline():
-    assert data.next_milestone(data.load_milestones(), TODAY) is not None
-
-
 def test_time_ago():
     assert data.time_ago(NOW - timedelta(seconds=5), NOW) == "just now"
     assert data.time_ago(NOW - timedelta(minutes=1), NOW) == "1 minute ago"
@@ -102,64 +94,123 @@ def app_db(tmp_path, monkeypatch):
     return engine
 
 
-def run_app():
-    # The page caches its database connection; each test uses its own database.
+def run_app(page=None, params=None):
+    # The pages cache their database connection; each test uses its own database.
     st.cache_data.clear()
     st.cache_resource.clear()
     at = AppTest.from_file(APP, default_timeout=30)
+    for key, value in (params or {}).items():
+        at.query_params[key] = value
     at.run()
+    if page:
+        at.switch_page(page).run()
     return at
 
 
-def test_page_loads_with_no_scrape_runs(app_db):
+def board_data(at):
+    frames = at.get("iframe")
+    assert len(frames) == 1
+    html = frames[0].proto.srcdoc
+    return json.loads(re.search(r"var DATA = (.*?);\n", html).group(1))
+
+
+# --- fuse board (home page) -------------------------------------------------
+
+def test_fuse_board_is_the_home_page(app_db):
     at = run_app()
     assert not at.exception
-    assert at.title[0].value == "What changed this week"
+    assert at.title[0].value == "Fuse board"
+    board = board_data(at)
+    titles = {i["title"] for i in board["items"]}
+    assert "High-risk AI rules apply (Annex III)" in titles  # from the timeline
+    assert board["header"]["sources"] == 0
     assert any("haven't run yet" in w.value for w in at.warning)
 
 
-def test_page_warns_when_a_source_failed(app_db):
+def test_fuse_board_shows_a_failing_source(app_db):
     with repo.make_session(app_db) as s:
         repo.finish_run(s, repo.start_run(s, "nist"), error="RuntimeError: down")
     at = run_app()
     assert not at.exception
-    assert any("NIST" in w.value and "might be missing" in w.value for w in at.warning)
+    assert board_data(at)["header"]["failing"] == ["NIST"]
+    assert not at.warning
 
 
-def test_page_shows_ai_summary_and_urgency(app_db):
+def test_fuse_board_includes_document_deadlines(app_db):
     from database.models import Document
     with repo.make_session(app_db) as s:
         doc = s.query(Document).one()
         doc.risk_level = "Action Required"
-        doc.summary_json = {"tldr": ["First bullet.", "Second bullet.", "Third bullet."],
-                            "who_is_affected": "AI providers", "key_deadline_date": "", "key_deadline": "",
-                            "actions_required": [], "risk_level": "Action Required", "categories": ["penalties"],
-                            "_meta": {"model": "claude-sonnet-5-5", "based_on": "full_text",
-                                      "summarized_at": "2026-11-04T10:00:00"}}
+        doc.summary_json = {**SUMMARY, "key_deadline_date": (date.today() + timedelta(days=20)).isoformat(),
+                            "key_deadline": "Comments due."}
         s.commit()
-    at = run_app()
+    item = next(i for i in board_data(run_app())["items"] if i["kind"] == "document")
+    assert item["urgency"] == "red" and item["ai_urgency"] == "Action Required"
+    assert item["summary"] == SUMMARY["tldr"]
+
+
+# --- all documents ----------------------------------------------------------
+
+SUMMARY = {"tldr": ["First bullet.", "Second bullet.", "Third bullet."],
+           "who_is_affected": "AI providers", "key_deadline_date": "", "key_deadline": "",
+           "actions_required": [], "risk_level": "Action Required", "categories": ["penalties"],
+           "_meta": {"model": "claude-sonnet-5-5", "based_on": "full_text", "summarized_at": "2026-11-04T10:00:00"}}
+
+
+def test_documents_page_lists_every_document_with_its_source(app_db):
+    at = run_app("documents.py")
+    assert not at.exception
+    assert at.title[0].value == "All documents"
+    assert at.subheader[0].value.startswith("1 of 1 documents")
+    text = " ".join(m.value for m in at.markdown)
+    assert "Starting data" in text and "Costs \\$874 Million" in text
+    assert "No AI summary yet" in text
+    assert len(at.get("iframe")) == 1  # the next-5 fuse strip
+
+
+def test_documents_page_shows_ai_summary_and_urgency(app_db):
+    from database.models import Document
+    with repo.make_session(app_db) as s:
+        doc = s.query(Document).one()
+        doc.risk_level = "Action Required"
+        doc.summary_json = SUMMARY
+        s.commit()
+    at = run_app("documents.py")
     assert not at.exception
     text = " ".join(m.value for m in at.markdown)
     assert "Action Required" in text and "First bullet." in text
-    assert any(m.label == "Action Required" for m in at.metric)
+    assert at.expander[0].label == "Full AI summary"
+
+
+def test_documents_page_shows_a_failing_source(app_db):
+    with repo.make_session(app_db) as s:
+        repo.finish_run(s, repo.start_run(s, "nist"), error="RuntimeError: down")
+    at = run_app("documents.py")
+    assert not at.exception
+    table = at.dataframe[0].value
+    assert table.loc[0, "Source"] == "NIST" and "down" in table.loc[0, "Problem"]
 
 
 def test_filters_can_be_set_from_the_link(app_db):
-    st.cache_data.clear()
-    st.cache_resource.clear()
-    at = AppTest.from_file(APP, default_timeout=30)
-    at.query_params["urgency"] = "Action Required"
-    at.query_params["range"] = "All time"
-    at.run()
+    at = run_app("documents.py", {"urgency": "Action Required", "range": "Last 30 days", "category": "gpai"})
     assert not at.exception
     urgency = next(m for m in at.multiselect if m.label == "Urgency")
     assert urgency.value == ["Action Required"]
-    assert at.selectbox[0].value == "All time"
-    assert any("No updates match" in i.value for i in at.info)  # the test document has no urgency
+    assert next(m for m in at.multiselect if m.label == "Category").value == ["gpai"]
+    assert next(b for b in at.selectbox if b.label == "Date range").value == "Last 30 days"
+    assert any("No documents match" in i.value for i in at.info)  # the test document has no urgency
 
 
 def test_search_box_filters_the_list(app_db):
-    at = run_app()
+    at = run_app("documents.py")
     at.text_input[0].input("nothing matches this").run()
     assert not at.exception
-    assert any("No updates match" in i.value for i in at.info)
+    assert any("No documents match" in i.value for i in at.info)
+
+
+def test_sorting(app_db):
+    at = run_app("documents.py")
+    sort = next(b for b in at.selectbox if b.label == "Sort by")
+    for option in sort.options:
+        sort.set_value(option).run()
+        assert not at.exception
