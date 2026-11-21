@@ -1,0 +1,65 @@
+# Every Monday: check every source, summarize what's new, email it, and commit the
+# updated database. The push makes Streamlit Community Cloud redeploy the dashboard.
+name: Weekly update
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"  # Mondays 07:00 UTC
+  workflow_dispatch:      # the "Run workflow" button on the Actions tab
+    inputs:
+      summarize_backlog:
+        description: "Also summarize older documents that have no AI summary yet (spending cap still applies)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write  # to push the updated database
+
+concurrency:
+  group: weekly-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      ALERT_TO: ${{ secrets.ALERT_TO }}
+      SUMMARY_BUDGET_USD: "1.50"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Summarize older documents (only when asked)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.summarize_backlog }}
+        run: python main.py summarize --yes
+
+      - name: Scrape, summarize what's new, and email it
+        id: weekly
+        run: python main.py weekly --yes
+
+      # Runs even if the step above failed (e.g. the email didn't send), so nothing found is lost.
+      - name: Commit the updated database
+        if: ${{ !cancelled() }}
+        run: |
+          if git diff --quiet -- data/tracker.db; then
+            echo "Database unchanged; nothing to commit."
+            exit 0
+          fi
+          size=$(stat -c %s data/tracker.db)
+          echo "Database size: $((size / 1024 / 1024)) MB"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/tracker.db
+          git commit -m "weekly update $(date -u +%F)"
+          git push

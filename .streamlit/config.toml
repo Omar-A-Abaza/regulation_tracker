@@ -5,9 +5,8 @@
 # Hide developer buttons like "Deploy"; viewers only see the app.
 toolbarMode = "viewer"
 
-[server]
-# Only this computer can open the dashboard. Change when we put it on a server.
-address = "localhost"
+# No [server] address on purpose: "localhost" would block Streamlit Community Cloud.
+# For a local-only run use: streamlit run dashboard/app.py --server.address localhost
 
 [browser]
 gatherUsageStats = false

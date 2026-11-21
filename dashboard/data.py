@@ -59,10 +59,20 @@ class DocRow:
     categories: list[str] = field(default_factory=list)
     summary: dict | None = None
     risk_level: str | None = None
+    watched: bool = False  # an "updated" note from the page watcher, not a document from a source
 
     @property
     def is_new(self) -> bool:
         return self.status == "new"
+
+
+def source_label(doc: DocRow) -> str:
+    """Where a document came from: a source's name, "Watched page", or "Starting data"."""
+    if doc.watched:
+        return "Watched page"
+    if doc.status == "seed":
+        return "Starting data"
+    return SOURCES.get(doc.source, doc.source)
 
 
 @dataclass
@@ -85,6 +95,7 @@ def load_documents(engine: Engine) -> list[DocRow]:
                 id=doc.id, source=doc.source, title=doc.title, url=doc.url, date_published=doc.date_published,
                 date_detected=doc.date_detected, framework=doc.framework, note=doc.note, status=status,
                 categories=list(doc.categories or []), summary=doc.summary_json, risk_level=doc.risk_level,
+                watched=(doc.external_id or "").startswith("page:"),
             ))
     return sort_newest_first(rows)
 
@@ -148,48 +159,9 @@ def load_milestones(path: Path = TIMELINE_FILE) -> list[dict]:
     return sorted(yaml.safe_load(path.read_text())["milestones"], key=lambda m: m["date"])
 
 
-def next_milestone(milestones: list[dict], today: date) -> dict | None:
-    return next((m for m in milestones if m["date"] >= today), None)
-
-
 # --- timeline -------------------------------------------------------------
 
 JURISDICTIONS = {"EU": "EU", "US-CA": "California", "US-CO": "Colorado"}
-SOON_DAYS = 90
-# Each state has an icon and a label, so color is never the only clue.
-MILESTONE_STATES = {"done": "✅ In force", "soon": f"⏳ Within {SOON_DAYS} days", "later": "🗓️ Later"}
-
-
-def milestone_state(milestone: dict, today: date) -> str:
-    days = (milestone["date"] - today).days
-    return "done" if days < 0 else "soon" if days <= SOON_DAYS else "later"
-
-
-def days_label(when: date, today: date) -> str:
-    days = (when - today).days
-    if days == 0:
-        return "today"
-    unit = "day" if abs(days) == 1 else "days"
-    return f"in {days} {unit}" if days > 0 else f"{-days} {unit} ago"
-
-
-def filter_milestones(
-    milestones: list[dict], *, jurisdictions: list[str] | None = None, categories: list[str] | None = None
-) -> list[dict]:
-    """Empty filter lists mean "everything"."""
-    kept = []
-    for m in milestones:
-        if jurisdictions and m["jurisdiction"] not in jurisdictions:
-            continue
-        if categories and not set(m.get("categories", [])) & set(categories):
-            continue
-        kept.append(m)
-    return kept
-
-
-def moved_milestones(milestones: list[dict]) -> list[dict]:
-    """Deadlines a later law pushed back (they have an original_date)."""
-    return [m for m in milestones if m.get("original_date")]
 
 
 def time_ago(then: datetime, now: datetime) -> str:

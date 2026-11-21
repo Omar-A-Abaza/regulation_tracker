@@ -2,6 +2,7 @@
 import re
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from dashboard import data
 from database import repository as repo
@@ -37,3 +38,18 @@ def md(text: str) -> str:
 def safe_url(url: str) -> str:
     # Brackets in links (like EU CELEX numbers "R(04)") break Markdown links.
     return url.replace("(", "%28").replace(")", "%29").replace(" ", "%20")
+
+
+def reload_button() -> None:
+    if st.button("Reload data", help="Pages re-read the database every 5 minutes. Click to do it now."):
+        st.cache_data.clear()
+        st.rerun()
+
+
+def show_html(html: str, fallback_height: int) -> None:
+    """Show our own HTML page (never user input) in a frame that fits its content.
+    Older Streamlit versions have no st.iframe; they get a fixed height worked out from the item count."""
+    if hasattr(st, "iframe"):
+        st.iframe(html, height="content")
+    else:
+        components.html(html, height=fallback_height, scrolling=True)

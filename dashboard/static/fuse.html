@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en" data-theme="__THEME__">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fuse board</title>
+<style>
+  /* No color-scheme on purpose: Streamlit's page uses "normal", and a different value here
+     would make browsers paint this frame's background instead of leaving it transparent. */
+  :root {
+    --bomb-edge: transparent;
+    --text: #1f2330; --muted: #5d6475; --faint: #8a90a0; --line: #d9dce3; --panel: #ffffff;
+    --chip: #f0f2f6; --chip-on: #1f2330; --chip-on-text: #ffffff; --shadow: 0 8px 28px rgba(20, 24, 36, .18);
+    --bomb: #2b2f3a; --bomb-cap: #5d6475; --rope: #b08a5a; --rope-dark: #8a6a42; --rope-new: #c9a46f;
+    --red: #d62f37; --orange: #c46a00; --later: #5f7398; --ok: #1a8a3a; --bad: #d62f37;
+    --red-bg: #fde8e9; --orange-bg: #fff1dc; --later-bg: #e8edf6; --blown-bg: #eceef2;
+    --focus: #2b6cd8;
+  }
+  @media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] {
+      --text: #e8eaf0; --muted: #a6acba; --faint: #7d8494; --line: #3a3f4c; --panel: #1b1f2a;
+      --chip: #262b37; --chip-on: #e8eaf0; --chip-on-text: #0e1117; --shadow: 0 8px 28px rgba(0, 0, 0, .55);
+      --bomb: #0b0d12; --bomb-cap: #7d8494; --bomb-edge: #6b7282; --rope: #a88356; --rope-dark: #7a5d3a; --rope-new: #c9a46f;
+      --red: #ff6369; --orange: #ffa94d; --later: #93a7cf; --ok: #4ccf72; --bad: #ff6369;
+      --red-bg: #3d1a1d; --orange-bg: #3b2a12; --later-bg: #232c3d; --blown-bg: #262a33;
+      --focus: #7aa7ff;
+    }
+  }
+  html[data-theme="dark"] {
+    --text: #e8eaf0; --muted: #a6acba; --faint: #7d8494; --line: #3a3f4c; --panel: #1b1f2a;
+    --chip: #262b37; --chip-on: #e8eaf0; --chip-on-text: #0e1117; --shadow: 0 8px 28px rgba(0, 0, 0, .55);
+    --bomb: #0b0d12; --bomb-cap: #7d8494; --bomb-edge: #6b7282; --rope: #a88356; --rope-dark: #7a5d3a; --rope-new: #c9a46f;
+    --red: #ff6369; --orange: #ffa94d; --later: #93a7cf; --ok: #4ccf72; --bad: #ff6369;
+    --red-bg: #3d1a1d; --orange-bg: #3b2a12; --later-bg: #232c3d; --blown-bg: #262a33;
+    --focus: #7aa7ff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: transparent; color: var(--text);
+    font: 14px/1.45 "Source Sans Pro", "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif; }
+  html { overflow-x: hidden; }
+  body { padding: 2px 8px 8px; position: relative; }
+  a { color: var(--focus); }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+
+  /* ---- header strip */
+  .strip { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; color: var(--muted);
+    padding: 6px 0 10px; border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+  .strip b { color: var(--text); }
+  .strip .sep { color: var(--faint); }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+  .dot.ok { background: var(--ok); } .dot.bad { background: var(--bad); }
+
+  /* ---- filter chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; align-items: center; }
+  .chips .group-gap { width: 10px; }
+  .chip { border: 1px solid var(--line); background: var(--chip); color: var(--text); border-radius: 999px;
+    padding: 3px 11px; font: inherit; font-size: 13px; cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--chip-on); color: var(--chip-on-text); border-color: var(--chip-on); }
+  .chip.clear { background: transparent; border-style: dashed; color: var(--muted); }
+
+  /* ---- fuse rows */
+  .axis, .row { display: grid; grid-template-columns: minmax(220px, 36%) 1fr; column-gap: 14px; align-items: center; }
+  .axis { height: 22px; color: var(--faint); font-size: 11px; }
+  .axis .scale { position: relative; height: 100%; margin-left: 40px; margin-right: 16px; }
+  .axis .tick { position: absolute; bottom: 2px; transform: translateX(-50%); white-space: nowrap; }
+  .axis .tick::after { content: ""; position: absolute; left: 50%; top: 100%; height: 5px; border-left: 1px solid var(--line); }
+  .axis .lead { font-size: 11px; color: var(--faint); }
+  .row { min-height: 52px; padding: 4px 6px; margin: 0 -6px; border-radius: 8px; cursor: pointer; }
+  .row.moved { min-height: 66px; }
+  .row:hover, .row.active { background: var(--chip); }
+  .label { min-width: 0; }
+  .label .title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .label .meta { color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .label .left { font-weight: 600; }
+  .row.red .left { color: var(--red); } .row.orange .left { color: var(--orange); } .row.later .left { color: var(--later); }
+  .tag { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 4px; background: var(--chip);
+    color: var(--muted); border: 1px solid var(--line); margin-left: 4px; vertical-align: 1px; }
+  .track { position: relative; height: 40px; display: flex; align-items: center; }
+  .bomb { flex: none; width: 34px; height: 34px; }
+  .lane { position: relative; flex: 1; height: 100%; margin-left: 6px; margin-right: 16px; }
+  .lane::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dotted var(--line); }
+  .rope { position: absolute; left: 0; top: calc(50% - 2px); height: 4px; border-radius: 2px;
+    background: repeating-linear-gradient(90deg, var(--rope) 0 5px, var(--rope-dark) 5px 7px); }
+  .rope .new { position: absolute; top: 0; bottom: 0; right: 0; border-radius: 2px;
+    background: repeating-linear-gradient(90deg, var(--rope-new) 0 5px, var(--rope) 5px 7px); }
+  .knot { position: absolute; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 3px;
+    transform: rotate(45deg); background: var(--rope-dark); border: 2px solid var(--panel); }
+  .knot-label { position: absolute; top: calc(50% + 8px); font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .spark { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%;
+    background: radial-gradient(circle, #fffbe6 0 22%, #ffd34d 40%, rgba(255, 140, 0, .55) 62%, rgba(255, 90, 0, 0) 72%);
+    animation: flicker var(--speed, 1.4s) ease-in-out infinite alternate; }
+  .spark::before, .spark::after { content: ""; position: absolute; left: 50%; top: 50%; width: 2px; height: 2px;
+    border-radius: 50%; background: #ffcf40; animation: ember var(--speed, 1.4s) linear infinite; }
+  .spark::after { animation-delay: calc(var(--speed, 1.4s) / -2); background: #ff8a1f; }
+  .row.red .spark { --speed: .28s; width: 20px; height: 20px; margin: -10px 0 0 -10px;
+    background: radial-gradient(circle, #ffffff 0 20%, #ffe14d 36%, rgba(255, 70, 40, .75) 58%, rgba(255, 40, 0, 0) 72%); }
+  .row.orange .spark { --speed: .6s; }
+  .row.later .spark { --speed: 1.6s; opacity: .8; }
+  @keyframes flicker { from { transform: scale(.82); opacity: .78; } to { transform: scale(1.12); opacity: 1; } }
+  @keyframes ember { from { transform: translate(-50%, -50%); opacity: 1; }
+    to { transform: translate(7px, -11px); opacity: 0; } }
+  .row.red .bomb .body { fill: var(--bomb); stroke: var(--red); stroke-width: 1.5; }
+
+  /* ---- already blew */
+  details.blown { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 8px; }
+  details.blown summary { cursor: pointer; color: var(--muted); font-weight: 600; padding: 4px 0; }
+  .bursts { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 0 4px; }
+  .burst { display: flex; gap: 8px; align-items: center; background: var(--blown-bg); color: var(--muted);
+    border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px 6px 6px; max-width: 340px;
+    cursor: pointer; font: inherit; text-align: left; }
+  .burst:hover, .burst.active { border-color: var(--faint); }
+  .burst svg { flex: none; width: 28px; height: 28px; }
+  .burst .t { font-weight: 600; color: var(--text); opacity: .8; font-size: 13px; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .burst .s { font-size: 12px; }
+  .empty { color: var(--muted); padding: 16px 0; }
+
+  /* ---- the card */
+  #card { position: absolute; z-index: 10; width: min(440px, calc(100vw - 16px)); background: var(--panel);
+    color: var(--text); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
+    padding: 14px 16px; overflow-y: auto; max-height: 440px; display: none;
+    scrollbar-width: thin; scrollbar-color: var(--faint) transparent; }
+  #card.open { display: block; }
+  #card h3 { margin: 6px 0 2px; font-size: 16px; line-height: 1.3; }
+  #card .when { color: var(--muted); margin-bottom: 8px; }
+  #card .sec { margin-top: 8px; }
+  #card .sec > b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  #card ul { margin: 2px 0 0; padding-left: 18px; }
+  #card p { margin: 2px 0 0; }
+  #card .linked li { margin-bottom: 6px; }
+  #card .linked a { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  #card .linked ul ul { padding-left: 16px; color: var(--muted); }
+  #card .close { position: absolute; top: 6px; right: 8px; border: 0; background: transparent; color: var(--muted);
+    font-size: 18px; cursor: pointer; line-height: 1; padding: 4px; }
+  .badge { display: inline-block; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 1px 9px; margin-right: 4px; }
+  .badge.red { background: var(--red-bg); color: var(--red); }
+  .badge.orange { background: var(--orange-bg); color: var(--orange); }
+  .badge.later { background: var(--later-bg); color: var(--later); }
+  .badge.blown, .badge.plain { background: var(--blown-bg); color: var(--muted); }
+  .muted { color: var(--muted); }
+
+  /* Room for an open card even when only a few fuses are shown. */
+  body.full { min-height: 460px; }
+
+  /* ---- small mode (strip on the documents page) */
+  body.small .row { min-height: 44px; }
+  body.small .row.moved { min-height: 44px; }
+  body.small .knot-label { display: none; }
+
+  /* ---- phones: fuses stack under their labels */
+  @media (max-width: 640px) {
+    .axis, .row { grid-template-columns: 1fr; }
+    .axis .lead { display: none; }
+    .row { padding-top: 8px; }
+    .label .title { white-space: normal; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .spark, .spark::before, .spark::after { animation: none !important; }
+    .spark::before, .spark::after { display: none; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="card" role="dialog" aria-modal="false" aria-labelledby="card-title"></div>
+<script>
+(function () {
+  "use strict";
+  var DATA = /*__DATA__*/null;
+  var SMALL = DATA.mode === "small";
+  var app = document.getElementById("app");
+  var card = document.getElementById("card");
+  document.body.classList.add(SMALL ? "small" : "full");
+
+  var AI_BADGES = { "Action Required": ["red", "🔴 Action Required"], "Watch": ["orange", "🟡 Watch"],
+                    "Informational": ["plain", "⚪ Informational"] };
+  var on = { region: new Set(), cat: new Set() };
+  var pinned = null, active = null, hideTimer = null, refocusing = false;
+
+  function el(tag, attrs, kids) {
+    var node = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      if (k === "class") node.className = attrs[k];
+      else if (k === "text") node.textContent = attrs[k];
+      else if (k === "html") node.innerHTML = attrs[k];  // only used with our own static SVG
+      else node.setAttribute(k, attrs[k]);
+    });
+    (kids || []).forEach(function (kid) { if (kid != null) node.append(kid); });
+    return node;
+  }
+  function link(url, text) {
+    var safe = /^https?:\/\//i.test(url || "") ? url : "#";
+    return el("a", { href: safe, target: "_blank", rel: "noopener noreferrer", text: text });
+  }
+
+  var BOMB = '<svg class="bomb" viewBox="0 0 40 40" aria-hidden="true">' +
+    '<rect x="27" y="16" width="9" height="8" rx="1.5" fill="var(--bomb-cap)"/>' +
+    '<circle class="body" cx="17" cy="20" r="14" fill="var(--bomb)" stroke="var(--bomb-edge)" stroke-width="1.2"/>' +
+    '<ellipse cx="11.5" cy="14" rx="4" ry="2.6" fill="#fff" opacity=".28" transform="rotate(-35 11.5 14)"/></svg>';
+  var BURST = '<svg viewBox="0 0 40 40" aria-hidden="true"><polygon fill="var(--faint)" opacity=".55" ' +
+    'points="20,1 24,13 36,7 29,18 39,22 27,25 32,37 21,29 14,39 13,27 2,30 10,20 1,12 13,13 9,2 18,10"/>' +
+    '<circle cx="20" cy="20" r="5" fill="var(--panel)" opacity=".9"/></svg>';
+
+  function matches(item) {
+    if (on.region.size && !on.region.has(item.region)) return false;
+    if (on.cat.size && !item.categories.some(function (c) { return on.cat.has(c); })) return false;
+    return true;
+  }
+
+  // ---------------------------------------------------------------- header + chips
+  function renderHeader() {
+    var h = DATA.header;
+    if (!h) return null;
+    var parts = [];
+    parts.push(el("span", {}, [h.updated ? "Updated " : "Not checked yet", h.updated ? el("b", { text: h.updated }) : null,
+      h.updated_ago ? el("span", { class: "muted", text: " (" + h.updated_ago + ")" }) : null]));
+    parts.push(el("span", {}, [el("b", { text: String(h.new_this_week) }), " new this week"]));
+    parts.push(el("span", {}, [el("b", { text: String(h.needs_action) }), " need action"]));
+    var health;
+    if (!h.sources) health = el("span", {}, [el("span", { class: "dot bad", "aria-hidden": "true" }), "Sources not checked yet"]);
+    else if (h.failing.length) health = el("span", {}, [el("span", { class: "dot bad", "aria-hidden": "true" }),
+      "Failing: ", el("b", { text: h.failing.join(", ") })]);
+    else health = el("span", {}, [el("span", { class: "dot ok", "aria-hidden": "true" }), "All " + h.sources + " sources working"]);
+    parts.push(health);
+    var strip = el("div", { class: "strip", role: "status" });
+    parts.forEach(function (p, i) {
+      if (i) strip.append(el("span", { class: "sep", "aria-hidden": "true", text: "·" }));
+      strip.append(p);
+    });
+    return strip;
+  }
+
+  function chip(group, key, label) {
+    var b = el("button", { class: "chip", type: "button", "aria-pressed": String(on[group].has(key)), text: label });
+    b.addEventListener("click", function () {
+      on[group].has(key) ? on[group].delete(key) : on[group].add(key);
+      hideCard(true);
+      render();
+      var again = app.querySelector('.chip[data-k="' + group + ":" + key + '"]');
+      if (again) again.focus();
+    });
+    b.dataset.k = group + ":" + key;
+    return b;
+  }
+
+  function renderChips() {
+    var present = { region: new Set(), cat: new Set() };
+    DATA.items.forEach(function (i) { present.region.add(i.region); i.categories.forEach(function (c) { present.cat.add(c); }); });
+    var box = el("div", { class: "chips", role: "group", "aria-label": "Filter deadlines" });
+    Object.keys(DATA.regions).forEach(function (k) { if (present.region.has(k)) box.append(chip("region", k, DATA.regions[k])); });
+    box.append(el("span", { class: "group-gap" }));
+    Object.keys(DATA.categories).forEach(function (k) { if (present.cat.has(k)) box.append(chip("cat", k, DATA.categories[k])); });
+    if (on.region.size || on.cat.size) {
+      var clear = el("button", { class: "chip clear", type: "button", text: "Clear filters" });
+      clear.addEventListener("click", function () { on.region.clear(); on.cat.clear(); hideCard(true); render(); });
+      box.append(clear);
+    }
+    return box;
+  }
+
+  // ---------------------------------------------------------------- fuses
+  function pct(x) { return (x * 100).toFixed(2) + "%"; }
+
+  function renderAxis() {
+    var scale = el("div", { class: "scale", "aria-hidden": "true" });
+    DATA.ticks.forEach(function (t) {
+      var tick = el("span", { class: "tick", text: t.label });
+      tick.style.left = pct(t.at);
+      scale.append(tick);
+    });
+    return el("div", { class: "axis" }, [el("div", { class: "lead", text: "Fuse length = time left (log scale)" }), scale]);
+  }
+
+  function renderRow(item) {
+    var cls = "row " + item.urgency + (item.moved ? " moved" : "");
+    var aria = item.title + ". " + item.date_label + ", " + item.when + "." + (item.moved ? " " + item.moved.label + "." : "");
+    var row = el("div", { class: cls, tabindex: "0", role: "button", "aria-haspopup": "dialog",
+                          "aria-expanded": "false", "aria-label": aria });
+    var meta = el("div", { class: "meta" }, [el("span", { class: "left", text: item.when }), " · " + item.date_label]);
+    if (item.where) meta.append(" · " + item.where);
+    var title = el("div", { class: "title", text: item.title });
+    if (item.kind === "document") title.append(el("span", { class: "tag", text: "from a document" }));
+    row.append(el("div", { class: "label" }, [title, meta]));
+
+    var lane = el("div", { class: "lane" });
+    var rope = el("div", { class: "rope" });
+    rope.style.width = pct(item.fuse);
+    lane.append(rope);
+    if (item.moved) {
+      var knotAt = Math.max(item.moved.knot, 0.015);
+      if (item.fuse > knotAt) {
+        var spliced = el("div", { class: "new" });
+        spliced.style.width = pct((item.fuse - knotAt) / item.fuse);
+        rope.append(spliced);
+      }
+      var knot = el("div", { class: "knot", title: "Old date: " + item.moved.from_label });
+      knot.style.left = pct(knotAt);
+      lane.append(knot);
+      var kl = el("div", { class: "knot-label", text: item.moved.label });
+      kl.style.left = pct(knotAt);
+      if (knotAt > 0.5) kl.style.transform = "translateX(-100%)";  // keep it inside the lane
+      lane.append(kl);
+    }
+    var spark = el("div", { class: "spark" });
+    spark.style.left = pct(item.fuse);
+    lane.append(spark);
+    var track = el("div", { class: "track", "aria-hidden": "true", html: BOMB });
+    track.append(lane);
+    row.append(track);
+    wire(row, item);
+    return row;
+  }
+
+  function renderBurst(item) {
+    var b = el("button", { class: "burst", type: "button", "aria-haspopup": "dialog", "aria-expanded": "false",
+                           "aria-label": item.title + ". " + item.blown_label + ", " + item.when + ".", html: BURST });
+    b.append(el("span", {}, [el("span", { class: "t", text: item.title }),
+                             el("span", { class: "s", text: item.blown_label || item.date_label })]));
+    wire(b, item);
+    return b;
+  }
+
+  // ---------------------------------------------------------------- card
+  function section(label, kids) { return el("div", { class: "sec" }, [el("b", { text: label })].concat(kids)); }
+  function list(items) { return el("ul", {}, items.map(function (t) { return el("li", { text: t }); })); }
+
+  function fillCard(item) {
+    card.textContent = "";
+    var close = el("button", { class: "close", type: "button", "aria-label": "Close", text: "×" });
+    close.addEventListener("click", function () { hideCard(true, true); });
+    card.append(close);
+    var badges = el("div", {}, [el("span", { class: "badge " + item.urgency, text: item.urgency === "blown" ? "💥 " + item.urgency_label : item.urgency_label })]);
+    if (item.ai_urgency && AI_BADGES[item.ai_urgency]) {
+      badges.append(el("span", { class: "badge " + AI_BADGES[item.ai_urgency][0], text: AI_BADGES[item.ai_urgency][1] }));
+    }
+    if (item.kind === "document") badges.append(el("span", { class: "badge plain", text: "From a document" }));
+    card.append(badges);
+    card.append(el("h3", { id: "card-title", tabindex: "-1", text: item.title }));
+    card.append(el("div", { class: "when", text: item.date_label + " · " + item.when }));
+    if (item.moved) card.append(el("div", { class: "sec" }, [el("span", { class: "badge orange", text: "Moved" }),
+      "Was " + item.moved.from_label + " · " + item.moved.label]));
+
+    if (item.summary.length > 1) card.append(section("Summary", [list(item.summary)]));
+    else if (item.summary.length) card.append(section("Summary", [el("p", { text: item.summary[0] })]));
+    else if (item.kind === "document") card.append(section("Summary", [el("p", { class: "muted", text: "No AI summary yet." })]));
+    if (item.deadline_note) card.append(section("Deadline", [el("p", { text: item.deadline_note })]));
+    if (item.who) card.append(section("Who's affected", [el("p", { text: item.who })]));
+    if (item.actions.length) card.append(section("What to do", [list(item.actions)]));
+    if (item.articles.length) card.append(section("Articles", [el("p", { text: item.articles.join(", ") })]));
+    if (item.url) card.append(el("div", { class: "sec" }, [link(item.url, (item.source ? item.source + " · " : "") + "Open source ↗")]));
+
+    if (item.kind === "milestone") {
+      var lis = item.linked.map(function (d) {
+        var li = el("li", {}, [link(d.url, d.title)]);
+        if (d.date_label) li.append(el("div", { class: "muted", text: d.date_label }));
+        if (d.bullets.length) li.append(list(d.bullets));
+        else li.append(el("div", { class: "muted", text: "No AI summary yet." }));
+        return li;
+      });
+      card.append(section("Related documents", lis.length ? [el("ul", { class: "linked" }, lis)]
+        : [el("p", { class: "muted", text: "None tracked yet." })]));
+    }
+  }
+
+  // Below the item, unless it fits above in full and not below. The Streamlit frame grows to
+  // fit its content, so a card below is never cut off.
+  function placeCard(anchor) {
+    var margin = 8, r = anchor.getBoundingClientRect();
+    var w = card.offsetWidth, h = card.offsetHeight;
+    var track = anchor.querySelector(".track");
+    var left = (track && window.innerWidth > 640 ? track.getBoundingClientRect().left : r.left);
+    left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
+    var fitsBelow = r.bottom + 4 + h <= window.innerHeight - margin, fitsAbove = r.top - 4 - h >= margin;
+    var top = (!fitsBelow && fitsAbove) ? r.top - h - 4 : r.bottom + 4;
+    card.style.left = (left + window.scrollX) + "px";
+    card.style.top = (top + window.scrollY) + "px";
+    // Make the page tall enough to hold the card, so Streamlit's frame grows to show all of it.
+    var need = Math.ceil(top + window.scrollY + h + margin);
+    document.body.style.minHeight = need > document.body.offsetHeight ? need + "px" : "";
+  }
+
+  function showCard(anchor, item) {
+    clearTimeout(hideTimer);
+    if (active && active !== anchor) { active.classList.remove("active"); active.setAttribute("aria-expanded", "false"); }
+    active = anchor;
+    anchor.classList.add("active");
+    anchor.setAttribute("aria-expanded", "true");
+    fillCard(item);
+    card.classList.add("open");
+    placeCard(anchor);
+  }
+
+  function hideCard(force, refocus) {
+    if (pinned && !force) return;
+    var was = active;
+    card.classList.remove("open");
+    document.body.style.minHeight = "";
+    if (active) { active.classList.remove("active"); active.setAttribute("aria-expanded", "false"); }
+    active = null; pinned = null;
+    if (refocus && was) { refocusing = true; was.focus(); refocusing = false; }
+  }
+
+  function wire(node, item) {
+    node.addEventListener("mouseenter", function () { if (!pinned) showCard(node, item); });
+    node.addEventListener("mouseleave", function () { if (!pinned) hideTimer = setTimeout(function () { hideCard(); }, 180); });
+    node.addEventListener("focus", function () {
+      if (refocusing || pinned === node) return;
+      pinned = null;
+      showCard(node, item);
+    });
+    node.addEventListener("blur", function (e) {
+      if (!pinned && !card.contains(e.relatedTarget)) hideTimer = setTimeout(function () { hideCard(); }, 120);
+    });
+    function toggle(fromKey) {
+      if (pinned === node) { hideCard(true); return; }
+      showCard(node, item);
+      pinned = node;
+      if (fromKey) card.querySelector("h3").focus();
+    }
+    node.addEventListener("click", function (e) { e.stopPropagation(); toggle(false); });
+    node.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(true); }
+    });
+  }
+
+  card.addEventListener("mouseenter", function () { clearTimeout(hideTimer); });
+  card.addEventListener("mouseleave", function () { if (!pinned) hideTimer = setTimeout(function () { hideCard(); }, 180); });
+  card.addEventListener("click", function (e) { e.stopPropagation(); });
+  document.addEventListener("click", function () { hideCard(true); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && active) hideCard(true, true); });
+
+  // ---------------------------------------------------------------- page
+  var blownOpen = false;
+
+  function render() {
+    app.textContent = "";
+    var items = DATA.items.filter(matches);
+    var upcoming = items.filter(function (i) { return i.urgency !== "blown"; });
+    var blown = items.filter(function (i) { return i.urgency === "blown"; }).reverse();  // most recent first
+    if (SMALL) upcoming = upcoming.slice(0, 5);
+    else {
+      var head = renderHeader();
+      if (head) app.append(head);
+      app.append(renderChips());
+    }
+    if (!upcoming.length) {
+      var none = SMALL ? "No upcoming deadlines." : blown.length ? "No upcoming deadlines match these filters."
+        : "No deadlines match these filters.";
+      app.append(el("div", { class: "empty", text: none }));
+    }
+    if (upcoming.length) {
+      app.append(renderAxis());
+      var rows = el("div", { role: "group", "aria-label": "Upcoming deadlines, soonest first" });
+      upcoming.forEach(function (i) { rows.append(renderRow(i)); });
+      app.append(rows);
+    }
+    if (!SMALL && blown.length) {
+      var det = el("details", { class: "blown" });
+      if (blownOpen) det.open = true;
+      det.append(el("summary", { text: "💥 Already blew (" + blown.length + ")" }));
+      det.addEventListener("toggle", function () { blownOpen = det.open; hideCard(true); });
+      var wrap = el("div", { class: "bursts" });
+      blown.forEach(function (i) { wrap.append(renderBurst(i)); });
+      det.append(wrap);
+      app.append(det);
+    }
+  }
+
+  window.addEventListener("resize", function () { if (active) placeCard(active); });
+
+  render();
+})();
+</script>
+</body>
+</html>

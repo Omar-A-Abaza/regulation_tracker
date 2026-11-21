@@ -1,8 +1,11 @@
 # AI Regulation Tracker
 
-> Automatic monitoring of AI regulation across the EU and the US, with a dashboard that answers one question first: **what changed this week?**
+> Automatic monitoring of AI regulation across the EU and the US, with a dashboard that answers two questions first: **what's about to blow, and what changed this week?**
 
-![The "What's new" page, filtered to GPAI documents that need action, with the AI summary open](docs/images/home.png)
+**Live dashboard:** https://YOUR-APP.streamlit.app <!-- TODO: replace with the real address after the first Streamlit Cloud deploy -->
+· **Updates itself every Monday**, no computer of yours needs to be on.
+
+![The fuse board: every deadline is a bomb with a lit fuse. The red one is 11 days out, and its summary card is open](docs/images/home.png)
 
 ## Why this exists
 
@@ -31,15 +34,24 @@ The database starts with **14 hand-checked documents** (the AI Act, the GPAI Cod
 - **Tells "really new" apart from "old but newly found".** The first time a source is checked, everything looks new. The tracker only counts later finds as news, so the weekly view stays honest.
 - **Filters the noise.** A Federal Register search for "artificial intelligence" returns 450+ documents since 2025, and most only mention AI once. The tracker keeps the ~33 that are actually about AI, using rules tested against real documents.
 - **Shows its own health.** Every run is logged. If a source fails, the dashboard says so, so "nothing new" never hides "something broke".
-- **Tracks deadlines**, including ones that moved.
+- **Shows every deadline as a lit fuse**, including the ones that moved, so the next thing about to land stands out.
+- **Stays online and updates itself.** The dashboard is hosted for free on Streamlit Community Cloud, and a GitHub Actions job checks every source each Monday, then commits the updated database, which redeploys the site.
 
 ## The dashboard
 
-**What's new:** the status message, new items this week, items needing action, the next deadline, and every recent update with its source, date, urgency, AI summary and tags. You can filter by framework, category (GPAI, high-risk, banned uses, fines and enforcement, and more), website, urgency, date range and search. Filters can also be set in the link, so a view can be shared: `?category=gpai&urgency=Action Required&range=All time`.
+**Fuse board** (home page): every deadline is a **bomb with a lit fuse**. The fuse is the time left, on a log scale capped at 3 years, so a deadline 2 weeks out and one 2 years out both read clearly.
 
-**Timeline:** every AI Act phase-in date plus key US state deadlines, with days left or days since. Deadlines the EU pushed back are shown with their old and new dates.
+- 🔴 **Within 30 days**: a red fuse with a fast, bright spark. 🟠 **Within 90 days**: orange. Later: gray-blue, with a slow spark.
+- **Hover, tap or tab to a fuse** for its card: the date, days left, a plain-English summary, who's affected, what to do, the urgency, the articles, the source, and (for a law's milestones) the related documents with their AI summaries.
+- **Moved deadlines get a spliced fuse.** A knot marks the old date, labeled e.g. "Extended +16 months by Reg. 2026/1744" (the EU's Digital Omnibus).
+- **Documents with a deadline join the board.** If a document's AI summary has a key deadline still ahead, it gets its own fuse, marked "from a document".
+- **Deadlines that have passed are exploded bombs**, in a collapsible "Already blew" row: "In force since Aug 2, 2025".
+- A header strip shows when the sources were last checked, what's new this week, what needs action, and a health dot that turns red and names any failing source.
+- Filter chips for EU / US / US states and for categories (GPAI, high-risk, banned uses, and more). It works in light and dark mode, on phones (fuses stack under their titles and a tap opens the card), with the keyboard, and with reduced motion (no spark animation).
 
-![The Timeline page](docs/images/timeline.png)
+**All documents:** the next 5 deadlines as a compact fuse strip, then every document in the database with its source (EUR-Lex, EU AI Office, NIST, Federal Register, a watched page, or the starting data), framework, categories, published and found dates, urgency, and a "Really new" marker. Open **Full AI summary** for the details. Filter by framework, category (GPAI, high-risk, banned uses, fines and enforcement, and more), website, urgency, date range and search, and sort by date, urgency or title. Filters can be set in the link, so a view can be shared: `/documents?category=gpai&urgency=Action Required&range=All time`. The website status table is at the bottom.
+
+![The All documents page, filtered to high-risk documents, with the next 5 deadlines on top](docs/images/documents.png)
 
 ## GPAI focus
 
@@ -74,25 +86,28 @@ flowchart LR
     E --> W[Page watcher<br/>+ change summary]
     S & W --> DB[(SQLite database<br/>documents · page fingerprints · scrape log)]
     DB <--> AI[AI summaries<br/>Claude Sonnet 5.5]
-    DB --> UI[Streamlit dashboard<br/>What's new · Timeline]
+    DB --> UI[Streamlit dashboard<br/>Fuse board · All documents]
     DB --> M[Weekly email]
 ```
+
+Every Monday at 07:00 UTC a **GitHub Actions** job runs `python main.py weekly --yes` (check every source, summarize what's new, email it) and commits the updated database. That push makes **Streamlit Community Cloud** redeploy the dashboard, so the live site always shows the latest data.
 
 ## Setup
 
 You need [conda](https://docs.conda.io/) (or any Python 3.12 setup).
 
 ```bash
-conda create -n regtracker python=3.12
+conda env create -f environment.yml    # makes the "regtracker" env and installs requirements.txt
 conda activate regtracker
-pip install -r requirements.txt
 
 python main.py init-db    # create the database (data/tracker.db)
 python main.py seed       # load the 14 starting documents
 python main.py scrape     # check every source (about 30 seconds)
 
-streamlit run dashboard/app.py    # open http://localhost:8501
+streamlit run dashboard/app.py --server.address localhost    # open http://localhost:8501
 ```
+
+The repository already includes `data/tracker.db` (the hosted dashboard reads it), so you can skip the three `main.py` lines to just look at the latest data.
 
 ### AI summaries and email (optional)
 
@@ -128,7 +143,7 @@ python main.py digest --test          # send yourself a test email
 | `python main.py summarize` | Summarize every document that doesn't have a summary yet (asks first) | Yes, cents |
 | `python main.py summarize --redo "Action Required"` | Re-summarize documents with one urgency level, e.g. after changing the instructions | Yes, cents |
 | `python main.py digest` | Email what's new since the last email (`--preview` to just print it) | No |
-| `python main.py weekly` | Scrape, summarize what's new, and email it. The one command a weekly job runs. | Only for new items |
+| `python main.py weekly --yes` | Scrape, summarize what's new, and email it. The one command the weekly job runs. Without `--yes` it asks before spending (unless there's no terminal to ask, like in a scheduled job). The spending cap always applies. | Only for new items |
 | `python main.py new` | List what's really new (last 7 days; `--days 30` for more) | No |
 | `python main.py list` | List the latest documents | No |
 | `python main.py runs` | Show the scrape log, including any errors | No |
@@ -137,6 +152,49 @@ python main.py digest --test          # send yourself a test email
 
 Each document is summarized **once** and saved. It's only redone if its text changes. A typical document costs about 1–2 cents with Claude Sonnet 5.5, and summarizing all ~70 existing documents costs about $1.50. After that, only new documents cost anything, which comes to cents a month. Every run shows an estimate first, has a spending cap, and skips whole-law documents over 40,000 tokens unless you ask for them (`--include-large`).
 
+## Always online, updated weekly
+
+### The live dashboard (Streamlit Community Cloud, free)
+
+Set up once, by hand:
+
+1. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
+2. **Create app** → repository `Omar-A-Abaza/regulation_tracker`, branch `master`, main file `dashboard/app.py`.
+3. Optional: pick a custom address under *Advanced settings*. Then put the address at the top of this README.
+
+The dashboard only reads the database, so it needs no secrets. (If you ever add some, put them in the app's *Secrets* box; the dashboard reads them like `.env`.) It redeploys on every push to `master`, including the weekly update.
+
+Free apps go to sleep after a few days with no visitors. The next visitor clicks the wake-up button and waits about 30 seconds. The data is unchanged.
+
+### The weekly update (GitHub Actions)
+
+[`.github/workflows/weekly.yml`](.github/workflows/weekly.yml) runs every **Monday at 07:00 UTC**. It needs four repository secrets, set once:
+
+```bash
+gh secret set ANTHROPIC_API_KEY
+gh secret set SMTP_USER
+gh secret set SMTP_PASSWORD
+gh secret set ALERT_TO
+```
+
+**Run it by hand:** on GitHub, open **Actions → Weekly update → Run workflow**, or from a terminal:
+
+```bash
+gh workflow run weekly.yml                                  # the normal weekly run
+gh workflow run weekly.yml -f summarize_backlog=true        # also summarize older documents (spending cap applies)
+gh run watch                                                # follow it
+```
+
+The job fails (and GitHub emails you) only if **every** source failed, or the summaries or the email failed. If just some sources fail, it carries on; the failure is in the scrape log and the dashboard's health dot turns red. The database is committed either way, so nothing found is lost.
+
+**Optional backup on your own computer** (off by default), e.g. with `crontab -e`:
+
+```
+0 8 * * 1  cd /path/to/regulation_tracker && ~/miniforge3/envs/regtracker/bin/python main.py weekly --yes >> weekly.log 2>&1
+```
+
+Only use one of the two at a time, or the database in the repository and the one on your computer will drift apart.
+
 ## Project structure
 
 ```
@@ -144,11 +202,12 @@ scrapers/      one file per source, plus shared tools (polite HTTP client, RSS r
 processors/    AI summaries (summarizer.py), full text (fulltext.py), tagging, change summaries
 notifications/ the update email (email_digest.py)
 database/      the 3 tables and the helper functions everything uses
-dashboard/     the Streamlit app: pages, data loading, and charts
+dashboard/     the Streamlit app: the Fuse board and All documents pages, data loading, and the fuse view (fuse.py + static/fuse.html)
 data/          the timeline, the starting documents, and the list of watched pages
-tests/         107 automated tests, using saved copies of real responses, a fake AI and a fake mail server
+tests/         130 automated tests, using saved copies of real responses, a fake AI and a fake mail server
 docs/          build notes, the fact check, and the AI Act summary
 main.py        the commands above
+.github/       the weekly GitHub Actions job
 ```
 
 ## Testing
@@ -157,7 +216,7 @@ main.py        the commands above
 pytest
 ```
 
-The tests run offline, against saved copies of real responses from each source. They cover the parsers, the AI filters, de-duplication, change detection, the "really new" logic, the scrape log, the summarizer and its money safety rails (with a fake AI, so tests never spend credit), the update email (with a fake mail server), and both dashboard pages end to end.
+The tests run offline, against saved copies of real responses from each source. They cover the parsers, the AI filters, de-duplication, change detection, the "really new" logic, the scrape log, the summarizer and its money safety rails (with a fake AI, so tests never spend credit), the update email (with a fake mail server), the weekly job and its `--yes` flag, the fuse board's data (log-scale fuse length, urgency buckets, exploded and moved deadlines, document deadlines), and both dashboard pages end to end.
 
 ## Design choices
 
@@ -172,7 +231,6 @@ The tests run offline, against saved copies of real responses from each source. 
 - **A cross-framework map** linking EU AI Act articles to NIST AI RMF and ISO/IEC 42001.
 - **A GPAI compliance checklist** and a 10²⁵ FLOP threshold calculator.
 - **An enforcement tracker** (fines and investigations under AI laws).
-- **A weekly schedule on a server** (EC2 or a scheduled cloud function) to run `python main.py weekly`.
 - **More sources:** the UK AI Security Institute, the FTC, state legislatures, and the OECD.
 
 **Known limits:**
@@ -180,6 +238,7 @@ The tests run offline, against saved copies of real responses from each source. 
 - **Some documents can't be fetched in full** (EU AI Office pages block programs, a few EU corrections have no text version, NIST's frameworks are PDFs). Their summaries are written from the title and description, and say so.
 - **Until a document is summarized, its tags come from keyword matching**, which is rougher.
 - **California's bill pages are behind a bot check**, so SB 53 is tracked through the starting data only.
+- **The free hosted dashboard sleeps** after a few days without visitors; the first visit after that takes about 30 seconds.
 
 ## Disclaimer
 
